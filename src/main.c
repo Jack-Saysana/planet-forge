@@ -1,6 +1,6 @@
 #include <main.h>
 
 int main() {
-  printf("HEHEHEHEHEHEHEH\n");
+  square_lattice();  
   return 0;
 }
