@@ -4,7 +4,6 @@ int main() {
   GLFWwindow *window = init_gl();
 
   init_scene();
-  square_lattice();  
 
   while (!glfwWindowShouldClose(window)) {
     keyboard_input(window);

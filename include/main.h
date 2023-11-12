@@ -9,4 +9,3 @@ GLFWwindow *init_gl();
 void keyboard_input(GLFWwindow *);
 void render_scene(GLFWwindow *);
 void init_scene();
-void square_lattice();

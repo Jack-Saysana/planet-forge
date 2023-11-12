@@ -8,6 +8,7 @@ const char *vertex_shader =
 "uniform mat4 proj;\n"
 "void main() {\n"
 "  gl_Position = proj * view * model * vec4(in_pos, 1.0);\n"
+"  gl_PointSize = 1.0;\n"
 "}\n";
 
 const char *fragment_shader =
