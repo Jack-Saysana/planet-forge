@@ -11,7 +11,7 @@ int first_move = 1;
 double prev_x = 0.0;
 double prev_y = 0.0;
 
-int cursor_enabled = 0;
+int cursor_enabled = 1;
 
 int holding_grave = 0;
 

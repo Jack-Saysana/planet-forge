@@ -31,6 +31,70 @@ void init_model(MODEL *model, MESH_DATA *md) {
   glBindVertexArray(0);
 }
 
+MESH_DATA *gen_mesh(vec3 *points, ivec3 *triangles, size_t num_points,
+                    size_t num_tris) {
+  VERT *vertices = malloc(sizeof(VERT) * STARTING_BUFF_LEN);
+  if (vertices == NULL) {
+    fprintf(stderr, "model.c: Unable to allocate vertices.\n");
+    exit(1);
+  }
+  size_t num_verts = 0;
+  size_t verts_buf_size = STARTING_BUFF_LEN;
+
+  ivec3 *indices = malloc(sizeof(ivec3) * STARTING_BUFF_LEN);
+  if (indices == NULL) {
+    fprintf(stderr, "model.c: Unable to allocate indices.\n");
+    exit(1);
+  }
+  size_t num_inds = 0;
+  size_t ind_buf_size = STARTING_BUFF_LEN;
+
+  int status = 0;
+  for (size_t i = 0; i < num_tris; i++) {
+    ivec3 cur_tri = { 0, 0, 0 };
+    glm_ivec3_copy(triangles[i], cur_tri);
+
+    for (int i = 0; i < 3; i++) {
+      glm_vec3_copy(points[cur_tri[i]], vertices[num_verts].pos);
+      glm_vec3_zero(vertices[num_verts].norm);
+      glm_vec2_copy(points[cur_tri[i]], vertices[num_verts].tex_pos);
+
+      indices[num_inds][i] = num_verts;
+
+      num_verts++;
+      if (num_verts == verts_buf_size) {
+        status = double_buffer((void **) &vertices, &verts_buf_size,
+                               sizeof(VERT));
+        if (status) {
+          fprintf(stderr, "model.c: Unable to reallocate vertices\n");
+          exit(1);
+        }
+      }
+    }
+
+    num_inds++;
+    if (num_inds == ind_buf_size) {
+      status = double_buffer((void **) &indices, &ind_buf_size, sizeof(ivec3));
+      if (status) {
+        fprintf(stderr, "model.c: Unable to reallocate indices\n");
+        exit(1);
+      }
+    }
+  }
+
+  MESH_DATA *mesh = malloc(sizeof(MESH_DATA));
+  if (mesh == NULL) {
+    fprintf(stderr, "model.c: Unable to allocate mesh\n");
+    exit(1);
+  }
+  mesh->vertices = vertices;
+  mesh->indices = indices;
+  mesh->num_verts = num_verts;
+  mesh->num_inds = num_inds;
+
+  return mesh;
+}
+
 void draw_model(MODEL *model, unsigned int shader) {
   glUseProgram(shader);
   glActiveTexture(GL_TEXTURE0);

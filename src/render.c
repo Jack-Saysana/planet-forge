@@ -30,6 +30,8 @@ void init_scene() {
                   100.0, persp_proj);
 
   glEnable(GL_PROGRAM_POINT_SIZE);
+  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glEnable(GL_DEPTH_TEST);
 }
 
 void render_scene(GLFWwindow *window) {
@@ -37,7 +39,7 @@ void render_scene(GLFWwindow *window) {
   delta_time = current_frame - last_frame;
   last_frame = current_frame;
 
-  glClearColor(1.0, 0.0, 0.0, 1.0);
+  glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   //test_render();
@@ -68,7 +70,8 @@ void render_sphere() {
   set_mat4("model", model, test_shader);
   set_mat4("view", view, test_shader);
   set_mat4("proj", persp_proj, test_shader);
-  draw_points(sphere);
+  //draw_points(sphere);
+  draw_model(sphere, test_shader);
 }
 
 unsigned int init_shader(const char *vs, const char *gs, const char *fs) {
@@ -87,7 +90,7 @@ unsigned int init_shader(const char *vs, const char *gs, const char *fs) {
      return INVALID_SHADER;
   }
 
-  unsigned int geo_shader;
+  unsigned int geo_shader = INVALID_SHADER;
   if (gs) {
     int gs_len = strlen(fs);
     geo_shader = glCreateShader(GL_GEOMETRY_SHADER);

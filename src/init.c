@@ -24,7 +24,7 @@ GLFWwindow *init_gl() {
   glfwSetScrollCallback(window, mouse_scroll);
 
   glfwMakeContextCurrent(window);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     fprintf(stderr, "init.c: Failed to initialize GLAD\n");
