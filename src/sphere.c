@@ -21,7 +21,6 @@ MESH_DATA *gen_sphere() {
   }
 
   // TODO Generate edges here
-
   deparameterize(points);
 
   MESH_DATA *sphere = malloc(sizeof(MESH_DATA));
@@ -37,6 +36,7 @@ MESH_DATA *gen_sphere() {
 
 void deparameterize(VERT *points) {
   vec3 cur_sphere_pt = GLM_VEC3_ZERO_INIT;
+  float offset = 10.0;
   for (int i = 0; i < NUM_POINTS; i++) {
     // deparameterize into a sphere
     float theta = 2.0 * PI * points[i].pos[X];
@@ -46,18 +46,24 @@ void deparameterize(VERT *points) {
     cur_sphere_pt[Z] = RADIUS * cos(phi);
 
     // Apply perlin noise displacement
-    /*
     vec3 disp_vector = GLM_VEC3_ZERO_INIT;
     glm_vec3_copy(cur_sphere_pt, disp_vector);
     glm_normalize(disp_vector);
-    float displacement = perlin(points[i].pos[X], points[i].pos[Y], FREQ,
-                                DEPTH, SEED);
-    disp_vector[X] *= displacement;
-    disp_vector[Y] *= displacement;
-    disp_vector[Z] *= displacement;
-    glm_vec3_add(cur_sphere_pt, disp_vector, cur_sphere_pt);
-    */
 
+    /* Addresses seam issues from perlin noise */
+    float uvx = cos(PI * (points[i].pos[X] - points[i].pos[Y]));
+    float uvy = cos(PI * (points[i].pos[X] + points[i].pos[Y] - 1.0));
+    float mask = fmax((uvx + uvy) / 10.0, 0.0);
+    float displacement = perlin(points[i].pos[X] * offset, points[i].pos[Y] * offset,
+                                FREQ, DEPTH, SEED);
+
+    /* Clamp perlin output between -0.5 and 0.5  */
+    displacement -= 0.5;
+    displacement *= (float) RADIUS;
+    disp_vector[X] *= displacement * mask;
+    disp_vector[Y] *= displacement * mask;
+    disp_vector[Z] *= displacement * mask;
     glm_vec3_copy(cur_sphere_pt, points[i].pos);
+    glm_vec3_add(disp_vector, points[i].pos, points[i].pos);
   }
 }
