@@ -1,6 +1,12 @@
 #include <model.h>
 
-void init_model(MODEL *model, MESH_DATA *md) {
+MODEL *init_model(MESH_DATA *md) {
+  MODEL *model = malloc(sizeof(MODEL));
+  if (model == NULL) {
+    fprintf(stderr, "model.c: Failed to allocate model\n");
+    exit(1);
+  }
+
   size_t num_verts = md->num_verts * 8;
   size_t num_inds = md->num_inds * 3;
 
@@ -27,8 +33,11 @@ void init_model(MODEL *model, MESH_DATA *md) {
                GL_STATIC_DRAW);
 
   model->num_indices = num_inds;
+  model->texture = INVALID_TEXTURE;
 
   glBindVertexArray(0);
+
+  return model;
 }
 
 MESH_DATA *gen_mesh(vec3 *points, ivec3 *triangles, size_t num_points,
@@ -93,6 +102,37 @@ MESH_DATA *gen_mesh(vec3 *points, ivec3 *triangles, size_t num_points,
   mesh->num_inds = num_inds;
 
   return mesh;
+}
+
+MESH_DATA *copy_mesh(MESH_DATA *mesh) {
+  MESH_DATA *dest = malloc(sizeof(MESH_DATA));
+  if (dest == NULL) {
+    fprintf(stderr, "model.c: Failed to allocate mesh copy\n");
+    exit(1);
+  }
+
+  dest->vertices = malloc(sizeof(VERT) * mesh->num_verts);
+  if (dest->vertices == NULL) {
+    fprintf(stderr, "model.c: Failed to allocate copy of mesh vertices\n");
+    exit(1);
+  }
+  dest->num_verts = mesh->num_verts;
+
+  dest->indices = malloc(sizeof(VERT) * mesh->num_inds);
+  if (dest->indices == NULL) {
+    fprintf(stderr, "model.c: Failed to allocate copy of mesh indices\n");
+    exit(1);
+  }
+  dest->num_inds = mesh->num_inds;
+
+  for (size_t i = 0; i < dest->num_verts; i++) {
+    dest->vertices[i] = mesh->vertices[i];
+  }
+  for (size_t i = 0; i < dest->num_inds; i++) {
+    glm_ivec3_copy(mesh->indices[i], dest->indices[i]);
+  }
+
+  return dest;
 }
 
 void draw_model(MODEL *model, unsigned int shader) {

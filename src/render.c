@@ -3,34 +3,15 @@
 void init_scene() {
   test_shader = init_shader(vertex_shader, NULL, fragment_shader);
 
-  VERT test_verts[] = {
-    {{ 1.0,  1.0, -10.0}, {0.0, 0.0, 1.0}, { 1.0,  1.0}},
-    {{ 1.0, -1.0, -10.0}, {0.0, 0.0, 1.0}, { 1.0, -1.0}},
-    {{-1.0, -1.0, -10.0}, {0.0, 0.0, 1.0}, {-1.0, -1.0}},
-    {{-1.0,  1.0, -10.0}, {0.0, 0.0, 1.0}, {-1.0,  1.0}}
-  };
-
-  ivec3 test_inds[] = {
-    {0, 1, 2},
-    {2, 3, 0}
-  };
-
-  MESH_DATA md = {
-    test_verts,
-    test_inds,
-    4,
-    2
-  };
-
-  init_model(&test_model, &md);
-  sphere = gen_sphere();
+  sphere_mesh = gen_sphere();
+  sphere = init_model(sphere_mesh);
 
   glm_ortho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0, ortho_proj);
   glm_perspective(glm_rad(45.0f), ((float) RES_X) / ((float) RES_Y), 0.1,
                   100.0, persp_proj);
 
   glEnable(GL_PROGRAM_POINT_SIZE);
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glEnable(GL_DEPTH_TEST);
 }
 
@@ -42,22 +23,10 @@ void render_scene(GLFWwindow *window) {
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  //test_render();
   render_sphere();
 
   glfwSwapBuffers(window);
   glfwPollEvents();
-}
-
-void test_render() {
-  mat4 model = GLM_MAT4_IDENTITY_INIT;
-  mat4 view = GLM_MAT4_IDENTITY_INIT;
-
-  glUseProgram(test_shader);
-  set_mat4("model", model, test_shader);
-  set_mat4("view", view, test_shader);
-  set_mat4("proj", persp_proj, test_shader);
-  draw_model(&test_model, test_shader);
 }
 
 void render_sphere() {

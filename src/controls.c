@@ -21,9 +21,24 @@ void mouse_pos(GLFWwindow *window, double x, double y) {
 }
 
 void mouse_button(GLFWwindow *window, int button, int action, int mods) {
+  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+    DEPTH++;
+    printf("depth: %d\n", DEPTH);
+    refresh_sphere();
+  } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+    if (DEPTH > 1.0) {
+      DEPTH--;
+    }
+    printf("depth: %d\n", DEPTH);
+    refresh_sphere();
+  }
 }
 
 void mouse_scroll(GLFWwindow *window, double x_offset, double y_offset) {
+  float offset = y_offset * 0.05;
+  FREQ += offset;
+  printf("freq: %f\n", FREQ);
+  refresh_sphere();
 }
 
 void keyboard_input(GLFWwindow *window) {
@@ -53,6 +68,27 @@ void keyboard_input(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
     cam_translate((vec3) {delta_time, 0.0, 0.0});
   }
+
+  /* Increase Radius */
+  if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS &&
+      !holding_equal) {
+    RADIUS += 0.5;
+    printf("Radius: %f\n", RADIUS);
+    refresh_sphere();
+    holding_equal = 1;
+  } else if (glfwGetKey(window, GLFW_KEY_EQUAL) != GLFW_PRESS) {
+    holding_equal = 0;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS &&
+      !holding_minus) {
+    RADIUS -= 0.5;
+    printf("Radius: %f\n", RADIUS);
+    refresh_sphere();
+    holding_minus = 1;
+  } else if (glfwGetKey(window, GLFW_KEY_MINUS) != GLFW_PRESS) {
+    holding_minus = 0;
+  }
 }
 
 void fb_size_callback(GLFWwindow *window, int width, int height) {
@@ -65,3 +101,12 @@ void fb_size_callback(GLFWwindow *window, int width, int height) {
   glm_perspective(glm_rad(45.0f), ((float) RES_X) / ((float) RES_Y), 0.1,
                   100.0, persp_proj);
 }
+
+void refresh_sphere() {
+  MESH_DATA *noisy = copy_mesh(sphere_mesh);
+  apply_noise(noisy);
+  free_model(sphere);
+  sphere = init_model(noisy);
+  free_mesh_data(noisy);
+}
+

@@ -1,6 +1,6 @@
 #include <sphere.h>
 
-MODEL *gen_sphere() {
+MESH_DATA *gen_sphere() {
   /* Golden ratio */
   float phi = (1 + sqrt(5)) / 2;
   vec3 *points = malloc(sizeof(vec3) * NUM_POINTS);
@@ -40,44 +40,58 @@ MODEL *gen_sphere() {
   free(points);
   free(triangles);
 
+  // Convert flat mesh into a sphere
   deparameterize(mesh);
-
-  MODEL *model = malloc(sizeof(MODEL));
-  init_model(model, mesh);
-  free(mesh->vertices);
-  free(mesh->indices);
-
-  return model;
-  //return mesh;
+  return mesh;
 }
 
 void deparameterize(MESH_DATA *mesh) {
   vec3 cur_sphere_pt = GLM_VEC3_ZERO_INIT;
   for (size_t i = 0; i < mesh->num_verts; i++) {
-    // deparameterize into a sphere
     float theta = 2.0 * PI * mesh->vertices[i].pos[X];
     float phi = acos(1.0 - (2.0 * mesh->vertices[i].pos[Y]));
     cur_sphere_pt[X] = RADIUS * cos(theta) * sin(phi);
     cur_sphere_pt[Y] = RADIUS * sin(theta) * sin(phi);
     cur_sphere_pt[Z] = RADIUS * cos(phi);
 
+    glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
+    glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].norm);
+    glm_vec3_normalize(mesh->vertices[i].norm);
+  }
+}
+
+void apply_noise(MESH_DATA *mesh) {
+  float offset = 10.0;
+  vec3 cur_sphere_pt = GLM_VEC3_ZERO_INIT;
+  for (size_t i = 0; i < mesh->num_verts; i++) {
+    glm_vec3_copy(mesh->vertices[i].pos, cur_sphere_pt);
+
     // Apply perlin noise displacement
-    /*
     vec3 disp_vector = GLM_VEC3_ZERO_INIT;
     glm_vec3_copy(cur_sphere_pt, disp_vector);
     glm_normalize(disp_vector);
-    float displacement = perlin(points[i].pos[X], points[i].pos[Y], FREQ,
-                                DEPTH, SEED);
-    disp_vector[X] *= displacement;
-    disp_vector[Y] *= displacement;
-    disp_vector[Z] *= displacement;
-    glm_vec3_add(cur_sphere_pt, disp_vector, cur_sphere_pt);
-    */
 
-    // Calculate normal of deparameterized triangle
+    // Addresses seam issues from perlin noise
+    float uvx = cos(PI * (mesh->vertices[i].tex_pos[X] -
+                          mesh->vertices[i].tex_pos[Y]));
+    float uvy = cos(PI * (mesh->vertices[i].tex_pos[X] +
+                    mesh->vertices[i].tex_pos[Y] - 1.0));
+    float mask = fmax((uvx + uvy) / 10.0, 0.0);
+    float displacement = perlin(mesh->vertices[i].tex_pos[X] * offset,
+                                mesh->vertices[i].tex_pos[Y] * offset, FREQ,
+                                DEPTH, SEED);
+
+    // Clamp perlin output between -0.5 and 0.5
+    displacement -= 0.5;
+    displacement *= (float) RADIUS;
+    disp_vector[X] *= displacement * mask;
+    disp_vector[Y] *= displacement * mask;
+    disp_vector[Z] *= displacement * mask;
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
+    glm_vec3_add(disp_vector, mesh->vertices[i].pos, mesh->vertices[i].pos);
   }
 
+  // Calculate normal of each triangle
   ivec3 cur_triangle = { 0, 0, 0 };
   for (size_t i = 0; i < mesh->num_inds; i++) {
     glm_ivec3_copy(mesh->indices[i], cur_triangle);

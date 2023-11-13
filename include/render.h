@@ -11,8 +11,7 @@ float RES_X = RES_X_BASE;
 float RES_Y = RES_Y_BASE;
 
 unsigned int test_shader;
-MODEL test_model;
-//MESH_DATA *sphere;
+MESH_DATA *sphere_mesh;
 MODEL *sphere;
 
 mat4 ortho_proj;
@@ -27,9 +26,8 @@ void set_mat4(char *, mat4, unsigned int);
 
 // ======================= EXTERNALLY DEFINED FUNCTIONS =======================
 
-void init_model(MODEL *, MESH_DATA *);
-MODEL *gen_sphere();
-//MESH_DATA *gen_sphere();
+MODEL *init_model(MESH_DATA *);
+MESH_DATA *gen_sphere();
 void draw_model(MODEL *, unsigned int);
 void draw_points(MESH_DATA *);
 void calc_cam_space(mat4);
