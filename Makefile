@@ -5,7 +5,7 @@ SRC_DIR = ./src
 FILES = $(wildcard ./src/*.c)
 OBJS = $(FILES:%=$(BUILD_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
-DFLAGS = -g -O0 -Wall -Werror -MMD -MP
+DFLAGS = -g -O3 -Wall -Werror -MMD -MP
 
 # OS-SPECIFIC SETTINGS
 ifeq ($(OS),Windows_NT)
