@@ -50,9 +50,9 @@ void deparameterize(MESH_DATA *mesh) {
   for (size_t i = 0; i < mesh->num_verts; i++) {
     float theta = 2.0 * PI * mesh->vertices[i].pos[X];
     float phi = acos(1.0 - (2.0 * mesh->vertices[i].pos[Y]));
-    cur_sphere_pt[X] = RADIUS * cos(theta) * sin(phi);
-    cur_sphere_pt[Y] = RADIUS * sin(theta) * sin(phi);
-    cur_sphere_pt[Z] = RADIUS * cos(phi);
+    cur_sphere_pt[X] = cos(theta) * sin(phi);
+    cur_sphere_pt[Y] = sin(theta) * sin(phi);
+    cur_sphere_pt[Z] = cos(phi);
 
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].norm);
@@ -61,7 +61,7 @@ void deparameterize(MESH_DATA *mesh) {
 }
 
 void apply_noise(MESH_DATA *mesh) {
-  float offset = 10.0;
+  float offset = 1.0;
   vec3 cur_sphere_pt = GLM_VEC3_ZERO_INIT;
   for (size_t i = 0; i < mesh->num_verts; i++) {
     glm_vec3_copy(mesh->vertices[i].pos, cur_sphere_pt);
@@ -83,7 +83,7 @@ void apply_noise(MESH_DATA *mesh) {
 
     // Clamp perlin output between -0.5 and 0.5
     displacement -= 0.5;
-    displacement *= (float) RADIUS;
+    //displacement *= (float) RADIUS;
     disp_vector[X] *= displacement * mask;
     disp_vector[Y] *= displacement * mask;
     disp_vector[Z] *= displacement * mask;

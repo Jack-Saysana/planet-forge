@@ -20,7 +20,7 @@ void render_scene(GLFWwindow *window) {
   delta_time = current_frame - last_frame;
   last_frame = current_frame;
 
-  glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClearColor(0.25, 0.25, 0.25, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   render_sphere();
@@ -31,11 +31,19 @@ void render_scene(GLFWwindow *window) {
 
 void render_sphere() {
   mat4 model = GLM_MAT4_IDENTITY_INIT;
-  glm_translate(model, (vec3) {0.0, 0.0, -5.0});
+  vec3 sphere_center = { 0.0, 0.0, -5.0 };
+  glm_translate(model, sphere_center);
+  glm_scale(model, (vec3) {RADIUS, RADIUS, RADIUS});
   mat4 view = GLM_MAT4_IDENTITY_INIT;
   calc_cam_space(view);
 
   glUseProgram(test_shader);
+  vec3 light_pos = { day_cycle * (float) RADIUS * cos(0.25 * glfwGetTime()), 
+                     0.0,
+                     day_cycle * (float) RADIUS * sin(0.25 * glfwGetTime()) + -5.0 };
+  set_float("radius", RADIUS, test_shader);
+  set_vec3("sphere_center", sphere_center, test_shader);
+  set_vec3("light_pos", light_pos, test_shader);
   set_mat4("model", model, test_shader);
   set_mat4("view", view, test_shader);
   set_mat4("proj", persp_proj, test_shader);
@@ -106,4 +114,13 @@ unsigned int init_shader(const char *vs, const char *gs, const char *fs) {
 void set_mat4(char *name, mat4 matrix, unsigned int shader) {
   glUniformMatrix4fv(glGetUniformLocation(shader, name), 1, GL_FALSE,
                      (float *) matrix);
+}
+
+void set_vec3(char *name, vec3 vector, unsigned int shader) {
+  glUniform3fv(glGetUniformLocation(shader, name), 1,
+                     (float *) vector);
+}
+
+void set_float(char *name, float fl, unsigned int shader) {
+  glUniform1f(glGetUniformLocation(shader, name), fl);
 }

@@ -17,12 +17,17 @@ MODEL *sphere;
 mat4 ortho_proj;
 mat4 persp_proj;
 
+extern double RADIUS;
+float day_cycle = 5.0;
+
 // ======================= INTERNALLY DEFINED FUNCTIONS =======================
 
 unsigned int init_shader(const char *, const char *, const char *);
 void test_render();
 void render_sphere();
 void set_mat4(char *, mat4, unsigned int);
+void set_vec3(char *, vec3, unsigned int);
+void set_float(char *, float, unsigned int);
 
 // ======================= EXTERNALLY DEFINED FUNCTIONS =======================
 
