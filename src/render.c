@@ -31,7 +31,6 @@ void render_scene(GLFWwindow *window) {
 
 void render_sphere() {
   mat4 model = GLM_MAT4_IDENTITY_INIT;
-  vec3 sphere_center = { 0.0, 0.0, -5.0 };
   glm_translate(model, sphere_center);
   glm_scale(model, (vec3) {RADIUS, RADIUS, RADIUS});
   mat4 view = GLM_MAT4_IDENTITY_INIT;

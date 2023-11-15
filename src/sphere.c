@@ -8,6 +8,7 @@ MESH_DATA *gen_sphere() {
   glm_vec3_copy((vec3) {1.0, 0.0, 0.0}, points[1]);
   glm_vec3_copy((vec3) {1.0, 1.0, 0.0}, points[2]);
   glm_vec3_copy((vec3) {0.0, 1.0, 0.0}, points[3]);
+  glm_vec3_copy((vec3) {0.0, 0.0, -5.0}, sphere_center);
 
   for (float i = 4; i < (float) NUM_POINTS; i += 1.0) {
     int index = (int) i;
@@ -57,6 +58,42 @@ void deparameterize(MESH_DATA *mesh) {
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].norm);
     glm_vec3_normalize(mesh->vertices[i].norm);
+  }
+}
+
+void increase_height(MESH_DATA *mesh) {
+  if (holding_zero) {
+    incr_intv += 0.0001;
+  }
+  VERT *vertex;
+  for (size_t i = 0; i < mesh->num_verts; i++) {
+    vertex = mesh->vertices + i;
+    float displacement = glm_vec3_distance((vec3) {0.0, 0.0, 0.0}, vertex->pos) - 1.0;
+    if (displacement > 0.035) {
+      vec3 disp_vector = GLM_VEC3_ZERO_INIT;
+      glm_vec3_copy(vertex->pos, disp_vector);
+      glm_vec3_normalize(disp_vector);
+      glm_vec3_scale(disp_vector, (1.0 + displacement - 0.035) * incr_intv, disp_vector);
+      glm_vec3_add(disp_vector, vertex->pos, vertex->pos);
+    }
+  }
+}
+
+void decrease_height(MESH_DATA *mesh) {
+  if (holding_nine) {
+    incr_intv -= 0.0001;
+    VERT *vertex;
+    for (size_t i = 0; i < mesh->num_verts; i++) {
+      vertex = mesh->vertices + i;
+      float displacement = glm_vec3_distance((vec3) {0.0, 0.0, 0.0}, vertex->pos) - 1.0;
+      if (displacement > 0.035) {
+        vec3 disp_vector = GLM_VEC3_ZERO_INIT;
+        glm_vec3_copy(vertex->pos, disp_vector);
+        glm_vec3_normalize(disp_vector);
+        glm_vec3_scale(disp_vector, (displacement - 0.035) * incr_intv, disp_vector);
+        glm_vec3_sub(vertex->pos, disp_vector, vertex->pos);
+      }
+    }
   }
 }
 

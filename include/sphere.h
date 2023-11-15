@@ -13,6 +13,10 @@ float FREQ = 0.05;
 
 float EPSILON = 0.5;
 double RADIUS = 1.0;
+float incr_intv = 0.0;
+vec3 sphere_center;
+extern int holding_zero;
+extern int holding_nine;
 
 /* ------------- INTERNALLY DEFINED FUNCITONS -----------*/
 

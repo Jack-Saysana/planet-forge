@@ -79,7 +79,7 @@ void keyboard_input(GLFWwindow *window) {
   } else if (glfwGetKey(window, GLFW_KEY_EQUAL) != GLFW_PRESS) {
     holding_equal = 0;
   }
-
+  /* Decrease Radius  */
   if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS &&
       !holding_minus) {
     RADIUS -= 0.5;
@@ -88,6 +88,22 @@ void keyboard_input(GLFWwindow *window) {
     holding_minus = 1;
   } else if (glfwGetKey(window, GLFW_KEY_MINUS) != GLFW_PRESS) {
     holding_minus = 0;
+  }
+
+  /* Increase Mountains */
+  if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) {
+    refresh_sphere();
+    holding_zero = 1;
+  } else if (glfwGetKey(window, GLFW_KEY_0) != GLFW_PRESS) {
+    holding_zero = 0;
+  }
+
+  /* Decrease Mountains */
+  if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) {
+    refresh_sphere();
+    holding_nine = 1;
+  } else if (glfwGetKey(window, GLFW_KEY_9) != GLFW_PRESS) {
+    holding_nine = 0;
   }
 }
 
@@ -105,8 +121,9 @@ void fb_size_callback(GLFWwindow *window, int width, int height) {
 void refresh_sphere() {
   MESH_DATA *noisy = copy_mesh(sphere_mesh);
   apply_noise(noisy);
+  increase_height(noisy);
+  decrease_height(noisy);
   free_model(sphere);
   sphere = init_model(noisy);
   free_mesh_data(noisy);
 }
-

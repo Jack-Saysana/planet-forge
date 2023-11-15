@@ -17,6 +17,8 @@ int cursor_enabled = 1;
 int holding_grave = 0;
 int holding_equal = 0;
 int holding_minus = 0;
+int holding_zero = 0;
+int holding_nine = 0;
 
 extern mat4 ortho_proj;
 extern mat4 persp_proj;
@@ -24,6 +26,7 @@ extern mat4 persp_proj;
 extern float FREQ;
 extern int DEPTH;
 extern double RADIUS;
+extern int SEED;
 extern MODEL *sphere;
 extern MESH_DATA *sphere_mesh;
 
@@ -42,3 +45,5 @@ MESH_DATA *copy_mesh(MESH_DATA *);
 MODEL *init_model(MESH_DATA *);
 void free_mesh_data(MESH_DATA *);
 void free_model(MODEL *);
+void increase_height(MESH_DATA *);
+void decrease_height(MESH_DATA *);

@@ -19,6 +19,7 @@ mat4 persp_proj;
 
 extern double RADIUS;
 float day_cycle = 5.0;
+extern vec3 sphere_center;
 
 // ======================= INTERNALLY DEFINED FUNCTIONS =======================
 
