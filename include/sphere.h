@@ -9,7 +9,7 @@
 int NUM_POINTS = 10000;
 int SEED = 1000;
 int DEPTH = 5;
-float FREQ = 0.05;
+float FREQ = 2.00;
 
 float EPSILON = 0.5;
 double RADIUS = 1.0;

@@ -14,6 +14,10 @@ void cam_translate(vec3 dir) {
   glm_vec3_sub(cam_pos, world_dir, cam_pos);
 }
 
+void get_cam_loc(vec3 input) {
+  glm_vec3_negate_to(cam_pos, input);
+}
+
 void cam_rotate_x(float angle) {
   pitch += angle;
   if (pitch > 89.0) {

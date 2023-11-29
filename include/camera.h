@@ -8,10 +8,11 @@ static vec3 base_x = { 1.0, 0.0, 0.0 };
 static float pitch = 0.0;
 static float yaw = 0.0;
 
-static vec3 cam_pos = GLM_VEC3_ZERO_INIT;
+static vec3 cam_pos = { 0.0, 0.0, -5.0 };
 
 // ======================= INTERNALLY DEFINED FUNCTIONS =======================
 
 void calc_cam_space(mat4);
+void get_cam_loc(vec3);
 
 // ======================= EXTERNALLY DEFINED FUNCTIONS =======================
