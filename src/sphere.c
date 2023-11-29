@@ -114,7 +114,7 @@ void deparameterize(MESH_DATA *mesh) {
 
 void increase_height(MESH_DATA *mesh) {
   if (holding_zero) {
-    incr_intv += 0.0001;
+    incr_intv += 0.001;
   }
   VERT *vertex;
   for (size_t i = 0; i < mesh->num_verts; i++) {
@@ -132,7 +132,7 @@ void increase_height(MESH_DATA *mesh) {
 
 void decrease_height(MESH_DATA *mesh) {
   if (holding_nine) {
-    incr_intv -= 0.0001;
+    incr_intv -= 0.001;
     VERT *vertex;
     for (size_t i = 0; i < mesh->num_verts; i++) {
       vertex = mesh->vertices + i;
@@ -171,6 +171,7 @@ void apply_noise(MESH_DATA *mesh) {
 
     // Clamp perlin output between -0.5 and 0.5
     displacement -= 0.5;
+    displacement *= (fabs(displacement) * mountain_size);
     //displacement *= (float) RADIUS;
     disp_vector[X] *= displacement * mask;
     disp_vector[Y] *= displacement * mask;

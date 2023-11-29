@@ -14,6 +14,7 @@ float FREQ = 2.00;
 float EPSILON = 0.5;
 double RADIUS = 1.0;
 float incr_intv = 0.0;
+float mountain_size = 5.0;
 vec3 sphere_center;
 extern int holding_zero;
 extern int holding_nine;
