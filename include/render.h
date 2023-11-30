@@ -57,3 +57,4 @@ void get_cam_loc(vec3);
 MODEL *gen_cube();
 void cheat();
 unsigned int gen_texture(char *);
+void refresh_sphere();

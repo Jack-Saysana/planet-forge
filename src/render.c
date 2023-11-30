@@ -7,12 +7,12 @@ void init_scene() {
   normal_shader = init_shader(vertex_shader_norm, geom_shader, frag_shader_norm);
 
   sphere_mesh = gen_sphere();
-  //cheat();
   sphere = init_model(sphere_mesh);
   normal_tex = gen_texture("./normal_map.png");
   ocean = init_model(sphere_mesh);
   sun = init_model(sphere_mesh);
   cube = gen_cube();
+  refresh_sphere();
 
   glm_ortho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0, ortho_proj);
   glm_perspective(glm_rad(45.0f), ((float) RES_X) / ((float) RES_Y), 0.1,

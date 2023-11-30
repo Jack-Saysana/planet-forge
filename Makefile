@@ -1,11 +1,11 @@
 CC = gcc
-PROJ_NAME = PF
-BUILD_DIR = ./bin
-SRC_DIR = ./src
+BUILD_DIR := ./bin
+SRC_DIR := ./src
 FILES = $(wildcard ./src/*.c)
 OBJS = $(FILES:%=$(BUILD_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
 DFLAGS = -g -O3 -Wall -Werror -MMD -MP
+FLAG = 0
 
 # OS-SPECIFIC SETTINGS
 ifeq ($(OS),Windows_NT)
@@ -23,23 +23,26 @@ else
   endif
 endif
 
-$(BUILD_DIR)/$(PROJ_NAME): $(OBJS)
+.PHONY: clean run debug
+
+all: ./bin/src $(BUILD_DIR)/EOW
+
+$(BUILD_DIR)/EOW: $(OBJS)
 	$(CC) $(LIBS) $(OBJS) -o $@ $(LINK)
 
 $(BUILD_DIR)/%.c.o: %.c
-	mkdir -p $(dir $@)
 	$(CC) $(DFLAGS) $(INCLUDE) -c $< -o $@
 
-.PHONY: clean
+./bin/src:
+	mkdir -p ./bin/src
+
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: run
 run:
-	@./bin/$(PROJ_NAME)
+	@./bin/EOW
 
-.PHONY: debug
 debug:
-	gdb ./bin/$(PROJ_NAME)
+	gdb ./bin/EOW
 
 -include $(DEPS)
