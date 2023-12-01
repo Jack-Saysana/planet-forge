@@ -5,12 +5,14 @@ void init_scene() {
   ocean_shader = init_shader(vertex_shader, NULL, frag_ocean_shader);
   sun_shader = init_shader(vertex_shader, NULL, frag_sun_shader);
   normal_shader = init_shader(vertex_shader_norm, geom_shader, frag_shader_norm);
+  star_shader = init_shader(vertex_shader, NULL, frag_stars_shader);
 
   sphere_mesh = gen_sphere();
   sphere = init_model(sphere_mesh);
   normal_tex = gen_texture("./maps/ocean_normal_map.jpg");
   ocean = init_model(sphere_mesh);
   sun = init_model(sphere_mesh);
+  stars = init_model(sphere_mesh);
   cube = gen_cube();
   refresh_sphere();
 
@@ -35,6 +37,7 @@ void render_scene(GLFWwindow *window) {
 
   render_sun();
   render_sphere();
+  render_stars();
   //render_cube();
   render_ocean();
   //render_normals();
@@ -97,6 +100,31 @@ void render_sphere() {
   set_mat4("view", view, test_shader);
   set_mat4("proj", persp_proj, test_shader);
   draw_model(sphere, test_shader);
+}
+
+void render_stars() {
+  mat4 model = GLM_MAT4_IDENTITY_INIT;
+  mat4 view = GLM_MAT4_IDENTITY_INIT;
+  vec3 trans = GLM_VEC3_ZERO_INIT;
+  glm_vec3_copy(sphere_center, trans);
+  vec3 camera_pos = GLM_VEC3_ZERO_INIT;
+  get_cam_loc(camera_pos);
+  glm_vec3_add(trans, camera_pos, trans);
+
+  glm_translate(model, trans);
+  glm_scale(model, (vec3) {
+    RADIUS + 100.0,
+    RADIUS + 100.0,
+    RADIUS + 100.0
+  });
+  calc_cam_space(view);
+  
+  glUseProgram(star_shader);
+  set_float("time", glfwGetTime(), star_shader);
+  set_mat4("model", model, star_shader);
+  set_mat4("view", view, star_shader);
+  set_mat4("proj", persp_proj, star_shader);
+  draw_model(cube, star_shader);
 }
 
 void render_ocean() {
