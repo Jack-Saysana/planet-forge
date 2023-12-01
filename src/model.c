@@ -195,6 +195,7 @@ MESH_DATA *copy_mesh(MESH_DATA *mesh) {
 void draw_model(MODEL *model, unsigned int shader) {
   glUseProgram(shader);
   glActiveTexture(GL_TEXTURE0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glBindTexture(GL_TEXTURE_2D, model->texture);
   glUniform1i(glGetUniformLocation(shader, "tex"), 0);
 

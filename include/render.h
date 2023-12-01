@@ -27,8 +27,9 @@ mat4 ortho_proj;
 mat4 persp_proj;
 
 extern double RADIUS;
-float day_cycle = 0.25;
+float day_cycle = 0.5;
 float ocean_offset = 0.01;
+int normal_map_enabled = 1;
 vec3 light_pos = GLM_VEC3_ZERO_INIT;
 extern vec3 sphere_center;
 

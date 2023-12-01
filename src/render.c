@@ -8,7 +8,7 @@ void init_scene() {
 
   sphere_mesh = gen_sphere();
   sphere = init_model(sphere_mesh);
-  normal_tex = gen_texture("./normal_map.png");
+  normal_tex = gen_texture("./maps/ocean_normal_map.jpg");
   ocean = init_model(sphere_mesh);
   sun = init_model(sphere_mesh);
   cube = gen_cube();
@@ -119,6 +119,7 @@ void render_ocean() {
   set_vec3("light_pos", light_pos, ocean_shader);
   set_float("time", glfwGetTime(), ocean_shader);
   set_vec3("camera_position", camera_pos, ocean_shader);
+  set_int("texture_enabled", normal_map_enabled, ocean_shader);
   set_mat4("model", model, ocean_shader);
   set_mat4("view", view, ocean_shader);
   set_mat4("proj", persp_proj, ocean_shader);
