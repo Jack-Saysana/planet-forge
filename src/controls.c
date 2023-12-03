@@ -21,6 +21,7 @@ void mouse_pos(GLFWwindow *window, double x, double y) {
 }
 
 void mouse_button(GLFWwindow *window, int button, int action, int mods) {
+  /*
   if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
     DEPTH++;
     printf("depth: %d\n", DEPTH);
@@ -32,6 +33,7 @@ void mouse_button(GLFWwindow *window, int button, int action, int mods) {
     printf("depth: %d\n", DEPTH);
     refresh_sphere();
   }
+  */
 }
 
 void mouse_scroll(GLFWwindow *window, double x_offset, double y_offset) {

@@ -2,10 +2,17 @@
 #include <string.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui_wrapper.h>
 #include <const.h>
 #include <globals.h>
 #include <shader_code.h>
 #include <model_str.h>
+
+extern int NUM_POINTS;
+extern int DEPTH;
+extern float FREQ;
+extern float EPSILON;
+extern float RADIUS;
 
 float RES_X = RES_X_BASE;
 float RES_Y = RES_Y_BASE;

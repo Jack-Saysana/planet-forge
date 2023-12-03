@@ -11,8 +11,14 @@ void init_scene() {
                   100.0, persp_proj);
 
   glEnable(GL_PROGRAM_POINT_SIZE);
-//  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glEnable(GL_DEPTH_TEST);
+
+  imgui_add_i_slider("NUM_POINTS", &NUM_POINTS, 4, 1000);
+  imgui_add_i_slider("DEPTH", &DEPTH, 0, 10);
+  imgui_add_f_slider("FREQ", &FREQ, 0.0, 10.0);
+  imgui_add_f_slider("EPSILON", &EPSILON, 0.0, 1.0);
+  imgui_add_f_slider("RADIUS", &RADIUS, 0.0, 10.0);
 }
 
 void render_scene(GLFWwindow *window) {
@@ -24,6 +30,7 @@ void render_scene(GLFWwindow *window) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   render_sphere();
+  render_imgui();
 
   glfwSwapBuffers(window);
   glfwPollEvents();

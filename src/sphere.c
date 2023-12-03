@@ -41,7 +41,7 @@ MESH_DATA *gen_sphere() {
   free(triangles);
 
   // Convert flat mesh into a sphere
-  deparameterize(mesh);
+  //deparameterize(mesh);
   return mesh;
 }
 
@@ -70,6 +70,7 @@ void apply_noise(MESH_DATA *mesh) {
     vec3 disp_vector = GLM_VEC3_ZERO_INIT;
     glm_vec3_copy(cur_sphere_pt, disp_vector);
     glm_normalize(disp_vector);
+    glm_vec3_copy((vec3) { 0.0, 0.0, 1.0 }, disp_vector);
 
     // Addresses seam issues from perlin noise
     float uvx = cos(PI * (mesh->vertices[i].tex_pos[X] -
@@ -123,4 +124,42 @@ int double_buffer(void **buffer, size_t *buf_size, size_t unit_size) {
   (*buffer) = new_buf;
   *buf_size = 2 * *buf_size;
   return 0;
+}
+
+void update_sphere() {
+  static int cur_num_pts = NUM_POINTS_INIT;
+  static int cur_depth = DEPTH_INIT;
+  static float cur_freq = FREQ_INIT;
+  static float cur_epsilon = EPSILON_INIT;
+  static float cur_radius = RADIUS_INIT;
+
+  if (cur_num_pts != NUM_POINTS) {
+    free_mesh_data(sphere_mesh);
+    free_model(sphere);
+    sphere_mesh = gen_sphere();
+    sphere = init_model(sphere_mesh);
+
+    cur_num_pts = NUM_POINTS;
+
+    cur_depth = DEPTH_INIT;
+    cur_freq = FREQ_INIT;
+    cur_epsilon = EPSILON_INIT;
+    cur_radius = RADIUS_INIT;
+
+    DEPTH = DEPTH_INIT;
+    FREQ = FREQ_INIT;
+    EPSILON = EPSILON_INIT;
+    RADIUS = RADIUS_INIT;
+  } else if (
+      cur_depth != DEPTH ||
+      cur_freq != FREQ ||
+      cur_epsilon != EPSILON ||
+      cur_radius != RADIUS) {
+    refresh_sphere();
+
+    cur_depth = DEPTH;
+    cur_freq = FREQ;
+    cur_epsilon = EPSILON;
+    cur_radius = RADIUS;
+  }
 }
