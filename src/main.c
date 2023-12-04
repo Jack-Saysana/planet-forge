@@ -10,6 +10,7 @@ int main() {
 
     render_scene(window);
     update_sphere();
+    update_camera();
   }
 
   imgui_cleanup();

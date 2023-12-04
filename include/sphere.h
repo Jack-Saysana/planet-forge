@@ -6,12 +6,6 @@
 #include <const.h>
 #include <model_str.h>
 
-#define NUM_POINTS_INIT (4)
-#define DEPTH_INIT (5)
-#define FREQ_INIT (0.05)
-#define EPSILON_INIT (0.5)
-#define RADIUS_INIT (1.0)
-
 int NUM_POINTS = NUM_POINTS_INIT;
 int SEED = 1000;
 int DEPTH = DEPTH_INIT;

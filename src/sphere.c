@@ -41,7 +41,7 @@ MESH_DATA *gen_sphere() {
   free(triangles);
 
   // Convert flat mesh into a sphere
-  //deparameterize(mesh);
+  deparameterize(mesh);
   return mesh;
 }
 
@@ -50,9 +50,9 @@ void deparameterize(MESH_DATA *mesh) {
   for (size_t i = 0; i < mesh->num_verts; i++) {
     float theta = 2.0 * PI * mesh->vertices[i].pos[X];
     float phi = acos(1.0 - (2.0 * mesh->vertices[i].pos[Y]));
-    cur_sphere_pt[X] = RADIUS * cos(theta) * sin(phi);
-    cur_sphere_pt[Y] = RADIUS * sin(theta) * sin(phi);
-    cur_sphere_pt[Z] = RADIUS * cos(phi);
+    cur_sphere_pt[X] = cos(theta) * sin(phi);
+    cur_sphere_pt[Y] = sin(theta) * sin(phi);
+    cur_sphere_pt[Z] = cos(phi);
 
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].norm);
@@ -70,7 +70,6 @@ void apply_noise(MESH_DATA *mesh) {
     vec3 disp_vector = GLM_VEC3_ZERO_INIT;
     glm_vec3_copy(cur_sphere_pt, disp_vector);
     glm_normalize(disp_vector);
-    glm_vec3_copy((vec3) { 0.0, 0.0, 1.0 }, disp_vector);
 
     // Addresses seam issues from perlin noise
     float uvx = cos(PI * (mesh->vertices[i].tex_pos[X] -
@@ -84,7 +83,6 @@ void apply_noise(MESH_DATA *mesh) {
 
     // Clamp perlin output between -0.5 and 0.5
     displacement -= 0.5;
-    displacement *= (float) RADIUS;
     disp_vector[X] *= displacement * mask;
     disp_vector[Y] *= displacement * mask;
     disp_vector[Z] *= displacement * mask;

@@ -19,6 +19,7 @@ void init_scene() {
   imgui_add_f_slider("FREQ", &FREQ, 0.0, 10.0);
   imgui_add_f_slider("EPSILON", &EPSILON, 0.0, 1.0);
   imgui_add_f_slider("RADIUS", &RADIUS, 0.0, 10.0);
+  imgui_add_i_slider("Camera Mode", &camera_mode, 0, 1);
 }
 
 void render_scene(GLFWwindow *window) {
@@ -38,9 +39,21 @@ void render_scene(GLFWwindow *window) {
 
 void render_sphere() {
   mat4 model = GLM_MAT4_IDENTITY_INIT;
-  glm_translate(model, (vec3) {0.0, 0.0, -5.0});
+  glm_translate(model, planet_pos);
+  glm_scale(model, (vec3) {RADIUS, RADIUS, RADIUS});
   mat4 view = GLM_MAT4_IDENTITY_INIT;
   calc_cam_space(view);
+
+  /*
+  for (size_t i = 0; i < 4; i++) {
+    fprintf(stderr, "| %f, %f, %f, %f |\n",
+            view[i][0],
+            view[i][1],
+            view[i][2],
+            view[i][3]);
+  }
+  fprintf(stderr, "\n");
+  */
 
   glUseProgram(test_shader);
   set_mat4("model", model, test_shader);
