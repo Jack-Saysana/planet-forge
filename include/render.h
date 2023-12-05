@@ -24,7 +24,6 @@ MODEL *sphere;
 MODEL *ocean;
 MODEL *sun;
 MODEL *cube;
-MODEL *stars;
 
 mat4 ortho_proj;
 mat4 persp_proj;
@@ -33,6 +32,8 @@ extern double RADIUS;
 float day_cycle = 0.25;
 float ocean_offset = 0.01;
 int normal_map_enabled = 1;
+vec2 min_max_height = GLM_VEC2_ZERO_INIT;
+extern float mountain_size;
 vec3 light_pos = GLM_VEC3_ZERO_INIT;
 extern vec3 sphere_center;
 
@@ -52,6 +53,7 @@ void set_float(char *, float, unsigned int);
 void set_int(char *, int, unsigned int);
 unsigned int load_shader(const char *, const char *, const char *);
 void update_shaders();
+void set_vec2(char *, vec2, unsigned int);
 
 // ======================= EXTERNALLY DEFINED FUNCTIONS =======================
 

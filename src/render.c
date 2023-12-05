@@ -7,8 +7,9 @@ void init_scene() {
   normal_tex = gen_texture("./maps/ocean_normal_map.jpg");
   ocean = init_model(sphere_mesh);
   sun = init_model(sphere_mesh);
-  stars = init_model(sphere_mesh);
   cube = gen_cube();
+  min_max_height[0] = FLT_MAX;
+  min_max_height[1] = FLT_MIN;
   refresh_sphere();
 
   glm_ortho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0, ortho_proj);
@@ -29,6 +30,7 @@ void update_shaders() {
   
   const char *o_shader = DIR"ocean.fs";
   const char *s_shader = DIR"sun.fs";
+  const char *st_shader = DIR"star.fs";
 
   const char *v_shader_norm = DIR"norm_vec.vs";
   const char *g_shader = DIR"norm_vec.gs";
@@ -37,6 +39,7 @@ void update_shaders() {
   test_shader = load_shader(v_shader, NULL, f_shader);
   ocean_shader = load_shader(v_shader, NULL, o_shader);
   sun_shader = load_shader(v_shader, NULL, s_shader);
+  star_shader = load_shader(v_shader, NULL, st_shader);
   normal_shader = load_shader(v_shader_norm, g_shader, norm_frag_shader);
 }
 
@@ -51,8 +54,8 @@ void render_scene(GLFWwindow *window) {
   render_sun();
   render_sphere();
   render_stars();
-  //render_cube();
   render_ocean();
+  //render_cube();
   //render_normals();
 
   glfwSwapBuffers(window);
@@ -106,6 +109,7 @@ void render_sphere() {
 
   glUseProgram(test_shader);
   set_float("radius", RADIUS, test_shader);
+  set_vec2("range", min_max_height, test_shader);
   set_vec3("sphere_center", sphere_center, test_shader);
   set_vec3("camera_position", camera_pos, test_shader);
   set_vec3("light_pos", light_pos, test_shader);
@@ -325,4 +329,9 @@ void set_float(char *name, float fl, unsigned int shader) {
 
 void set_int(char *name, int i, unsigned int shader) {
   glUniform1i(glGetUniformLocation(shader, name), i);
+}
+
+void set_vec2(char *name, vec2 vector, unsigned int shader) {
+  glUniform2fv(glGetUniformLocation(shader, name), 1,
+                     (float *) vector);
 }

@@ -117,6 +117,7 @@ void increase_height(MESH_DATA *mesh) {
     incr_intv += 0.001;
   }
   VERT *vertex;
+  float dist = 0.0;
   for (size_t i = 0; i < mesh->num_verts; i++) {
     vertex = mesh->vertices + i;
     float displacement = glm_vec3_distance((vec3) {0.0, 0.0, 0.0}, vertex->pos) - 1.0;
@@ -126,6 +127,13 @@ void increase_height(MESH_DATA *mesh) {
       glm_vec3_normalize(disp_vector);
       glm_vec3_scale(disp_vector, (1.0 + displacement - 0.035) * incr_intv, disp_vector);
       glm_vec3_add(disp_vector, vertex->pos, vertex->pos);
+      dist = glm_vec3_distance(sphere_center, vertex->pos);
+      if (dist > min_max_height[1]) {
+        min_max_height[1] = dist;
+      }
+      if (dist < min_max_height[0]) {
+        min_max_height[0] = dist;
+      }
     }
   }
 }
@@ -134,6 +142,7 @@ void decrease_height(MESH_DATA *mesh) {
   if (holding_nine) {
     incr_intv -= 0.001;
     VERT *vertex;
+    float dist = 0.0;
     for (size_t i = 0; i < mesh->num_verts; i++) {
       vertex = mesh->vertices + i;
       float displacement = glm_vec3_distance((vec3) {0.0, 0.0, 0.0}, vertex->pos) - 1.0;
@@ -143,14 +152,21 @@ void decrease_height(MESH_DATA *mesh) {
         glm_vec3_normalize(disp_vector);
         glm_vec3_scale(disp_vector, (displacement - 0.035) * incr_intv, disp_vector);
         glm_vec3_sub(vertex->pos, disp_vector, vertex->pos);
+        dist = glm_vec3_distance(sphere_center, vertex->pos);
+        if (dist > min_max_height[1]) {
+          min_max_height[1] = dist;
+        }
+        if (dist < min_max_height[0]) {
+          min_max_height[0] = dist;
+        }
       }
     }
   }
 }
 
 void apply_noise(MESH_DATA *mesh) {
-  float offset = 1.0;
   vec3 cur_sphere_pt = GLM_VEC3_ZERO_INIT;
+  float dist = 0.0;
   for (size_t i = 0; i < mesh->num_verts; i++) {
     glm_vec3_copy(mesh->vertices[i].pos, cur_sphere_pt);
 
@@ -165,19 +181,23 @@ void apply_noise(MESH_DATA *mesh) {
     float uvy = cos(PI * (mesh->vertices[i].tex_pos[X] +
                     mesh->vertices[i].tex_pos[Y] - 1.0));
     float mask = fmax((uvx + uvy) / 10.0, 0.0);
-    float displacement = perlin(mesh->vertices[i].tex_pos[X] * offset,
-                                mesh->vertices[i].tex_pos[Y] * offset, FREQ,
-                                DEPTH, SEED);
+    float displacement = perlin(mesh->vertices[i].tex_pos[X],
+                                mesh->vertices[i].tex_pos[Y],
+                                FREQ, DEPTH, SEED);
 
     // Clamp perlin output between -0.5 and 0.5
     displacement -= 0.5;
-    displacement *= (fabs(displacement) * mountain_size);
-    //displacement *= (float) RADIUS;
-    disp_vector[X] *= displacement * mask;
-    disp_vector[Y] *= displacement * mask;
-    disp_vector[Z] *= displacement * mask;
+    displacement *= mountain_size;
+    glm_vec3_scale(disp_vector, mask * displacement, disp_vector);
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
     glm_vec3_add(disp_vector, mesh->vertices[i].pos, mesh->vertices[i].pos);
+    dist = glm_vec3_distance(mesh->vertices[i].pos, sphere_center);
+    if (dist > min_max_height[1]) {
+      min_max_height[1] = dist;
+    }
+    if (dist < min_max_height[0]) {
+      min_max_height[0] = dist;
+    }
   }
 
   // Calculate normal of each triangle
