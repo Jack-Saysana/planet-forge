@@ -91,6 +91,14 @@ void keyboard_input(GLFWwindow *window) {
   } else if (glfwGetKey(window, GLFW_KEY_MINUS) != GLFW_PRESS) {
     holding_minus = 0;
   }
+
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS &&
+      !holding_space) {
+    cam_jump();
+    holding_space = 1;
+  } else if (glfwGetKey(window, GLFW_KEY_SPACE) != GLFW_PRESS) {
+    holding_space = 0;
+  }
 }
 
 void fb_size_callback(GLFWwindow *window, int width, int height) {

@@ -16,8 +16,13 @@ static float yaw = 0.0;
 static vec3 cam_pos = { 0.0, 1.0, -5.0 };
 static vec3 cam_right = { 1.0, 0.0, 0.0 };
 
+static float cam_velocity;
+
 // ======================= INTERNALLY DEFINED FUNCTIONS =======================
 
 void calc_cam_space(mat4);
 
 // ======================= EXTERNALLY DEFINED FUNCTIONS =======================
+
+float calc_displacement(vec2);
+void calc_tex_coords(vec2, vec2);

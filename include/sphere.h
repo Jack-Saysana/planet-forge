@@ -22,6 +22,8 @@ extern MODEL *sphere;
 MESH_DATA *gen_sphere();
 void deparameterize(MESH_DATA *);
 int double_buffer(void **, size_t *, size_t);
+float calc_displacement(vec2);
+void calc_tex_coords(vec2, vec2);
 
 /* ------------- EXTERNALLY DEFINED FUNCITONS -----------*/
 
