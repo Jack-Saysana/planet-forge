@@ -6,12 +6,6 @@
 #include <const.h>
 #include <model_str.h>
 
-#define NUM_POINTS_INIT (4)
-#define DEPTH_INIT (5)
-#define FREQ_INIT (0.05)
-#define EPSILON_INIT (0.5)
-#define RADIUS_INIT (1.0)
-
 int NUM_POINTS = NUM_POINTS_INIT;
 int SEED = 1000;
 int DEPTH = DEPTH_INIT;
@@ -22,12 +16,15 @@ float RADIUS = RADIUS_INIT;
 
 extern MESH_DATA *sphere_mesh;
 extern MODEL *sphere;
+extern MODEL *atmosphere;
 
 /* ------------- INTERNALLY DEFINED FUNCITONS -----------*/
 
 MESH_DATA *gen_sphere();
 void deparameterize(MESH_DATA *);
 int double_buffer(void **, size_t *, size_t);
+float calc_displacement(vec2);
+void calc_tex_coords(vec2, vec2);
 
 /* ------------- EXTERNALLY DEFINED FUNCITONS -----------*/
 

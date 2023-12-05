@@ -41,18 +41,18 @@ MESH_DATA *gen_sphere() {
   free(triangles);
 
   // Convert flat mesh into a sphere
-  //deparameterize(mesh);
+  deparameterize(mesh);
   return mesh;
 }
 
 void deparameterize(MESH_DATA *mesh) {
   vec3 cur_sphere_pt = GLM_VEC3_ZERO_INIT;
   for (size_t i = 0; i < mesh->num_verts; i++) {
-    float theta = 2.0 * PI * mesh->vertices[i].pos[X];
+    float theta = 2.0 * PI * (mesh->vertices[i].pos[X] - 0.5);
     float phi = acos(1.0 - (2.0 * mesh->vertices[i].pos[Y]));
-    cur_sphere_pt[X] = RADIUS * cos(theta) * sin(phi);
-    cur_sphere_pt[Y] = RADIUS * sin(theta) * sin(phi);
-    cur_sphere_pt[Z] = RADIUS * cos(phi);
+    cur_sphere_pt[X] = cos(theta) * sin(phi);
+    cur_sphere_pt[Y] = sin(theta) * sin(phi);
+    cur_sphere_pt[Z] = cos(phi);
 
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].norm);
@@ -61,7 +61,6 @@ void deparameterize(MESH_DATA *mesh) {
 }
 
 void apply_noise(MESH_DATA *mesh) {
-  float offset = 10.0;
   vec3 cur_sphere_pt = GLM_VEC3_ZERO_INIT;
   for (size_t i = 0; i < mesh->num_verts; i++) {
     glm_vec3_copy(mesh->vertices[i].pos, cur_sphere_pt);
@@ -70,9 +69,9 @@ void apply_noise(MESH_DATA *mesh) {
     vec3 disp_vector = GLM_VEC3_ZERO_INIT;
     glm_vec3_copy(cur_sphere_pt, disp_vector);
     glm_normalize(disp_vector);
-    glm_vec3_copy((vec3) { 0.0, 0.0, 1.0 }, disp_vector);
 
     // Addresses seam issues from perlin noise
+    /*
     float uvx = cos(PI * (mesh->vertices[i].tex_pos[X] -
                           mesh->vertices[i].tex_pos[Y]));
     float uvy = cos(PI * (mesh->vertices[i].tex_pos[X] +
@@ -84,10 +83,13 @@ void apply_noise(MESH_DATA *mesh) {
 
     // Clamp perlin output between -0.5 and 0.5
     displacement -= 0.5;
-    displacement *= (float) RADIUS;
     disp_vector[X] *= displacement * mask;
     disp_vector[Y] *= displacement * mask;
     disp_vector[Z] *= displacement * mask;
+    */
+
+    float displacement = calc_displacement(mesh->vertices[i].tex_pos);
+    glm_vec3_scale(disp_vector, displacement, disp_vector);
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
     glm_vec3_add(disp_vector, mesh->vertices[i].pos, mesh->vertices[i].pos);
   }
@@ -116,6 +118,26 @@ void apply_noise(MESH_DATA *mesh) {
   }
 }
 
+float calc_displacement(vec2 tex_coords) {
+  float offset = 10.0;
+  float uvx = cos(PI * (tex_coords[X] - tex_coords[Y]));
+  float uvy = cos(PI * (tex_coords[X] + tex_coords[Y] - 1.0));
+  float mask = fmax((uvx + uvy) / 10.0, 0.0);
+  float displacement = perlin(tex_coords[X] * offset,
+                              tex_coords[Y] * offset, FREQ,
+                              DEPTH, SEED);
+
+  // Clamp perlin output between -0.5 and 0.5
+  displacement -= 0.5;
+
+  return displacement * mask;
+}
+
+void calc_tex_coords(vec2 s_coords, vec2 tex_coords) {
+  tex_coords[X] = atan2(s_coords[Y], s_coords[X]) / (2.0 * PI) + 0.5;
+  tex_coords[Y] = (1.0 - s_coords[Z]) / 2.0;
+}
+
 int double_buffer(void **buffer, size_t *buf_size, size_t unit_size) {
   void *new_buf = realloc(*buffer, 2 * (*buf_size) * unit_size);
   if (new_buf == NULL) {
@@ -136,8 +158,10 @@ void update_sphere() {
   if (cur_num_pts != NUM_POINTS) {
     free_mesh_data(sphere_mesh);
     free_model(sphere);
+    free_model(atmosphere);
     sphere_mesh = gen_sphere();
     sphere = init_model(sphere_mesh);
+    atmosphere = init_model(sphere_mesh);
 
     cur_num_pts = NUM_POINTS;
 

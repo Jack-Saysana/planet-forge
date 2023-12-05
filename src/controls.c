@@ -59,16 +59,16 @@ void keyboard_input(GLFWwindow *window) {
   }
 
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    cam_translate((vec3) {0.0, 0.0, -1.0 * delta_time});
+    cam_translate((vec3) {0.0, 0.0, -speed * delta_time});
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    cam_translate((vec3) {-1.0 * delta_time, 0.0, 0.0});
+    cam_translate((vec3) {-speed * delta_time, 0.0, 0.0});
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    cam_translate((vec3) {0.0, 0.0, delta_time});
+    cam_translate((vec3) {0.0, 0.0, speed * delta_time});
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    cam_translate((vec3) {delta_time, 0.0, 0.0});
+    cam_translate((vec3) {speed * delta_time, 0.0, 0.0});
   }
 
   /* Increase Radius */
@@ -91,6 +91,14 @@ void keyboard_input(GLFWwindow *window) {
   } else if (glfwGetKey(window, GLFW_KEY_MINUS) != GLFW_PRESS) {
     holding_minus = 0;
   }
+
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS &&
+      !holding_space) {
+    cam_jump();
+    holding_space = 1;
+  } else if (glfwGetKey(window, GLFW_KEY_SPACE) != GLFW_PRESS) {
+    holding_space = 0;
+  }
 }
 
 void fb_size_callback(GLFWwindow *window, int width, int height) {
@@ -110,5 +118,10 @@ void refresh_sphere() {
   free_model(sphere);
   sphere = init_model(noisy);
   free_mesh_data(noisy);
+
+  MESH_DATA *new_atmo = gen_sphere();
+  free_model(atmosphere);
+  atmosphere = init_model(new_atmo);
+  free_mesh_data(new_atmo);
 }
 
