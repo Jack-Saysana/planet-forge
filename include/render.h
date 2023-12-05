@@ -4,8 +4,9 @@
 #include <GLFW/glfw3.h>
 #include <const.h>
 #include <globals.h>
-#include <shader_code.h>
 #include <model_str.h>
+
+#define DIR "./shaders/"
 
 float RES_X = RES_X_BASE;
 float RES_Y = RES_Y_BASE;
@@ -49,6 +50,8 @@ void set_mat4(char *, mat4, unsigned int);
 void set_vec3(char *, vec3, unsigned int);
 void set_float(char *, float, unsigned int);
 void set_int(char *, int, unsigned int);
+unsigned int load_shader(const char *, const char *, const char *);
+void update_shaders();
 
 // ======================= EXTERNALLY DEFINED FUNCTIONS =======================
 

@@ -1,12 +1,7 @@
 #include <render.h>
 
 void init_scene() {
-  test_shader = init_shader(vertex_shader, NULL, fragment_shader);
-  ocean_shader = init_shader(vertex_shader, NULL, frag_ocean_shader);
-  sun_shader = init_shader(vertex_shader, NULL, frag_sun_shader);
-  normal_shader = init_shader(vertex_shader_norm, geom_shader, frag_shader_norm);
-  star_shader = init_shader(vertex_shader, NULL, frag_stars_shader);
-
+  update_shaders();
   sphere_mesh = gen_sphere();
   sphere = init_model(sphere_mesh);
   normal_tex = gen_texture("./maps/ocean_normal_map.jpg");
@@ -25,6 +20,24 @@ void init_scene() {
   glEnable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+
+void update_shaders() {
+  const char *v_shader = DIR"default.vs";
+  const char *f_shader = DIR"default.fs";
+  
+  const char *o_shader = DIR"ocean.fs";
+  const char *s_shader = DIR"sun.fs";
+
+  const char *v_shader_norm = DIR"norm_vec.vs";
+  const char *g_shader = DIR"norm_vec.gs";
+  const char *norm_frag_shader = DIR"norm_vec.fs";
+
+  test_shader = load_shader(v_shader, NULL, f_shader);
+  ocean_shader = load_shader(v_shader, NULL, o_shader);
+  sun_shader = load_shader(v_shader, NULL, s_shader);
+  normal_shader = load_shader(v_shader_norm, g_shader, norm_frag_shader);
 }
 
 void render_scene(GLFWwindow *window) {
@@ -127,6 +140,25 @@ void render_stars() {
   draw_model(cube, star_shader);
 }
 
+void render_normals() {
+  mat4 model = GLM_MAT4_IDENTITY_INIT;
+  vec3 camera_pos = GLM_VEC3_ZERO_INIT;
+  get_cam_loc(camera_pos);
+  glm_translate(model, sphere_center);
+  glm_scale(model, (vec3) {
+    RADIUS + ocean_offset,
+    RADIUS + ocean_offset,
+    RADIUS + ocean_offset
+  });
+  mat4 view = GLM_MAT4_IDENTITY_INIT;
+  calc_cam_space(view);
+  glUseProgram(normal_shader);
+  set_mat4("model", model, normal_shader);
+  set_mat4("view", view, normal_shader);
+  set_mat4("proj", persp_proj, normal_shader);
+  draw_model(ocean, normal_shader);
+}
+
 void render_ocean() {
   mat4 model = GLM_MAT4_IDENTITY_INIT;
   vec3 camera_pos = GLM_VEC3_ZERO_INIT;
@@ -154,23 +186,67 @@ void render_ocean() {
   draw_model(ocean, ocean_shader);
 }
 
-void render_normals() {
-  mat4 model = GLM_MAT4_IDENTITY_INIT;
-  vec3 camera_pos = GLM_VEC3_ZERO_INIT;
-  get_cam_loc(camera_pos);
-  glm_translate(model, sphere_center);
-  glm_scale(model, (vec3) {
-    RADIUS + ocean_offset,
-    RADIUS + ocean_offset,
-    RADIUS + ocean_offset
-  });
-  mat4 view = GLM_MAT4_IDENTITY_INIT;
-  calc_cam_space(view);
-  glUseProgram(normal_shader);
-  set_mat4("model", model, normal_shader);
-  set_mat4("view", view, normal_shader);
-  set_mat4("proj", persp_proj, normal_shader);
-  draw_model(ocean, normal_shader);
+unsigned int load_shader(const char *v, const char *g, const char *f) {
+  char *vert = NULL; 
+  char *geo = NULL; 
+  char *frag = NULL;
+  FILE *vs = NULL;
+  FILE *gs = NULL;
+  FILE *fs = NULL;
+  int handle = -1;
+  if (v) {
+    vert = (char *)(malloc(4096)); 
+    int size = 0;
+    vs = fopen(v, "r");
+    while (fgetc(vs) != EOF) {
+      size++;
+    }
+    fseek(vs, 0, SEEK_SET); 
+    if (!fread(vert, 1, (size_t) size, vs)) {
+      printf("Issue reading vertex shader\n");
+    }
+    vert[size] = '\0';
+    fclose(vs);
+  }
+  if (g) {
+    geo = (char *)(malloc(4096));
+    int size = 0;
+    gs = fopen(g, "r");
+    while (fgetc(gs) != EOF) {
+      size++;
+    }
+    fseek(gs, 0, SEEK_SET);
+    if (!fread(geo, 1, (size_t) size, gs)) {
+      printf("Issue reading geometry shader\n");
+    }
+    geo[size] = '\0';
+    fclose(gs);
+  }
+  if (f) {
+    frag = (char *)(malloc(4096));
+    int size = 0;
+    fs = fopen(f, "r");
+    while (fgetc(fs) != EOF) {
+      size++;
+    }
+    fseek(fs, 0, SEEK_SET);
+    if (!fread(frag, 1, (size_t) size, fs)) {
+      printf("Issue reading fragment shader\n");
+    }
+    frag[size] = '\0';
+    fclose(fs);
+  }
+  handle = init_shader(vert, geo, frag);
+  if (vert) {
+  free(vert);
+  }
+  if (geo) {
+  free(geo);
+  }
+  if (frag) {
+  free(frag);
+  }
+  return handle;
 }
 
 unsigned int init_shader(const char *vs, const char *gs, const char *fs) {

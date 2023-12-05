@@ -105,6 +105,14 @@ void keyboard_input(GLFWwindow *window) {
   } else if (glfwGetKey(window, GLFW_KEY_9) != GLFW_PRESS) {
     holding_nine = 0;
   }
+
+    /* Decrease Mountains */
+  if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+    update_shaders();
+    holding_one = 1;
+  } else if (glfwGetKey(window, GLFW_KEY_1) != GLFW_PRESS) {
+    holding_one = 0;
+  }
 }
 
 void fb_size_callback(GLFWwindow *window, int width, int height) {

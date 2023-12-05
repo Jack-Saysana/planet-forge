@@ -19,6 +19,7 @@ int holding_equal = 0;
 int holding_minus = 0;
 int holding_zero = 0;
 int holding_nine = 0;
+int holding_one = 0;
 
 extern mat4 ortho_proj;
 extern mat4 persp_proj;
@@ -47,3 +48,4 @@ void free_mesh_data(MESH_DATA *);
 void free_model(MODEL *);
 void increase_height(MESH_DATA *);
 void decrease_height(MESH_DATA *);
+void update_shaders();
