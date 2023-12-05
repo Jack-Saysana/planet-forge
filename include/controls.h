@@ -26,6 +26,7 @@ extern float FREQ;
 extern int DEPTH;
 extern double RADIUS;
 extern MODEL *sphere;
+extern MODEL *atmosphere;
 extern MESH_DATA *sphere_mesh;
 
 // ======================= INTERNALLY DEFINED FUNCTIONS =======================

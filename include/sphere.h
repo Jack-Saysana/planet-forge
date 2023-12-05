@@ -16,6 +16,7 @@ float RADIUS = RADIUS_INIT;
 
 extern MESH_DATA *sphere_mesh;
 extern MODEL *sphere;
+extern MODEL *atmosphere;
 
 /* ------------- INTERNALLY DEFINED FUNCITONS -----------*/
 

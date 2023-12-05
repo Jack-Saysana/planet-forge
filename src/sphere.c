@@ -158,8 +158,10 @@ void update_sphere() {
   if (cur_num_pts != NUM_POINTS) {
     free_mesh_data(sphere_mesh);
     free_model(sphere);
+    free_model(atmosphere);
     sphere_mesh = gen_sphere();
     sphere = init_model(sphere_mesh);
+    atmosphere = init_model(sphere_mesh);
 
     cur_num_pts = NUM_POINTS;
 

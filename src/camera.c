@@ -136,9 +136,21 @@ void update_camera() {
 
 void cam_jump() {
   if (camera_mode == GROUND) {
+    vec3 cam_up = GLM_VEC3_ZERO_INIT;
+    glm_vec3_sub(cam_pos, planet_pos, cam_up);
+    if (cam_up[X] == 0.0 && cam_up[Y] == 0.0 && cam_up[Z] == 0.0) {
+      glm_vec3_copy((vec3) {0.0, 1.0, 0.0}, cam_up);
+    }
+    glm_vec3_normalize(cam_up);
+
     cam_velocity += 2.0;
+
+    vec2 tex_coords = GLM_VEC2_ZERO_INIT;
+    calc_tex_coords(cam_up, tex_coords);
+
+    float displacement = calc_displacement(tex_coords) * RADIUS;
     float dist = glm_vec3_distance(cam_pos, planet_pos);
-    if (dist < RADIUS + CAM_HEIGHT) {
+    if (dist < RADIUS + CAM_HEIGHT + displacement) {
       vec3 cam_up = GLM_VEC3_ZERO_INIT;
       glm_vec3_sub(cam_pos, planet_pos, cam_up);
       if (cam_up[X] == 0.0 && cam_up[Y] == 0.0 && cam_up[Z] == 0.0) {
@@ -147,8 +159,13 @@ void cam_jump() {
       glm_vec3_normalize(cam_up);
 
       vec3 correction_dir = GLM_VEC3_ZERO_INIT;
-      glm_vec3_scale(cam_up, RADIUS + CAM_HEIGHT - dist, correction_dir);
+      glm_vec3_scale(cam_up, (RADIUS + CAM_HEIGHT + displacement) - dist,
+                     correction_dir);
       glm_vec3_add(cam_pos, correction_dir, cam_pos);
     }
   }
+}
+
+void get_cam_pos(vec3 dest) {
+  glm_vec3_copy(cam_pos, dest);
 }
