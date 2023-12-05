@@ -3,6 +3,7 @@
 
 float delta_time = 0.0;
 float last_frame = 0.0;
+float speed = 1.0;
 int camera_mode = GROUND;
 
-vec3 planet_pos = { 0.0, 0.0, -5.0 };
+vec3 planet_pos = { 0.0, 0.0, 0.0 };
