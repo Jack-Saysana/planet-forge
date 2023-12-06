@@ -8,6 +8,8 @@
 extern float RES_X;
 extern float RES_Y;
 
+extern float incr_intv;
+
 int first_move = 1;
 double prev_x = 0.0;
 double prev_y = 0.0;
@@ -17,6 +19,10 @@ int cursor_enabled = 1;
 int holding_grave = 0;
 int holding_equal = 0;
 int holding_minus = 0;
+int holding_space = 0;
+int holding_zero = 0;
+int holding_nine = 0;
+int holding_one = 0;
 
 extern mat4 ortho_proj;
 extern mat4 persp_proj;
@@ -24,7 +30,9 @@ extern mat4 persp_proj;
 extern float FREQ;
 extern int DEPTH;
 extern double RADIUS;
+extern int SEED;
 extern MODEL *sphere;
+extern MODEL *atmosphere;
 extern MESH_DATA *sphere_mesh;
 
 // ======================= INTERNALLY DEFINED FUNCTIONS =======================
@@ -42,3 +50,5 @@ MESH_DATA *copy_mesh(MESH_DATA *);
 MODEL *init_model(MESH_DATA *);
 void free_mesh_data(MESH_DATA *);
 void free_model(MODEL *);
+void cam_jump();
+void update_shaders();

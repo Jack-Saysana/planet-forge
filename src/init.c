@@ -32,6 +32,7 @@ GLFWwindow *init_gl() {
     return NULL;
   }
 
+  init_imgui(window);
   glViewport(0, 0, RES_X_BASE, RES_Y_BASE);
 
   return window;

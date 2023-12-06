@@ -11,6 +11,8 @@ typedef struct model {
 typedef struct vertex {
   vec3 pos;
   vec3 norm;
+  vec3 tangent;
+  vec3 bitangent;
   vec2 tex_pos;
 } VERT;
 
