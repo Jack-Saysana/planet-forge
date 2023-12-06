@@ -239,7 +239,14 @@ void update_sphere() {
       cur_radius != RADIUS ||
       cur_incr_intv != incr_intv ||
       cur_mountain_size != mountain_size) {
-    refresh_sphere();
+    //refresh_sphere();
+    free_mesh_data(sphere_mesh);
+    free_model(sphere);
+    free_model(atmosphere);
+    sphere_mesh = gen_sphere();
+    atmosphere = init_model(sphere_mesh);
+    apply_noise(sphere_mesh);
+    sphere = init_model(sphere_mesh);
 
     cur_depth = DEPTH;
     cur_freq = FREQ;

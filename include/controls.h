@@ -37,7 +37,7 @@ extern MESH_DATA *sphere_mesh;
 
 // ======================= INTERNALLY DEFINED FUNCTIONS =======================
 
-void refresh_sphere();
+//void refresh_sphere();
 
 // ======================= EXTERNALLY DEFINED FUNCTIONS =======================
 

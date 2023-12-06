@@ -40,7 +40,7 @@ void mouse_scroll(GLFWwindow *window, double x_offset, double y_offset) {
   float offset = y_offset * 0.05;
   FREQ += offset;
   printf("freq: %f\n", FREQ);
-  refresh_sphere();
+  //refresh_sphere();
 }
 
 void keyboard_input(GLFWwindow *window) {
@@ -103,6 +103,7 @@ void keyboard_input(GLFWwindow *window) {
     holding_space = 0;
   }
 
+  /*
   // Increase Mountains
   if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) {
     incr_intv += 0.001;
@@ -114,6 +115,7 @@ void keyboard_input(GLFWwindow *window) {
     incr_intv -= 0.001;
     refresh_sphere();
   }
+  */
 }
 
 void fb_size_callback(GLFWwindow *window, int width, int height) {
@@ -127,6 +129,7 @@ void fb_size_callback(GLFWwindow *window, int width, int height) {
                   100.0, persp_proj);
 }
 
+/*
 void refresh_sphere() {
   MESH_DATA *noisy = copy_mesh(sphere_mesh);
   apply_noise(noisy);
@@ -141,3 +144,4 @@ void refresh_sphere() {
   atmosphere = init_model(new_atmo);
   free_mesh_data(new_atmo);
 }
+*/

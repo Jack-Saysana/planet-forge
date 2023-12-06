@@ -4,7 +4,7 @@
 
 extern float RADIUS;
 
-float CAM_HEIGHT = 0.1;
+float CAM_HEIGHT = 0.5;
 
 static vec3 base_up = { 0.0, 1.0, 0.0 };
 static vec3 base_dir = { 0.0, 0.0, -1.0 };

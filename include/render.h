@@ -76,4 +76,4 @@ void calc_cam_space(mat4);
 void get_cam_pos(vec3);
 MODEL *gen_cube();
 unsigned int gen_texture(char *);
-void refresh_sphere();
+//void refresh_sphere();

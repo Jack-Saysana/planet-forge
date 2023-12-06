@@ -40,4 +40,4 @@ MESH_DATA *gen_mesh(vec3 *, ivec3 *, size_t, size_t);
 MODEL *init_model(MESH_DATA *md);
 void free_mesh_data(MESH_DATA *);
 void free_model(MODEL *);
-void refresh_sphere();
+//void refresh_sphere();

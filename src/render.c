@@ -11,7 +11,7 @@ void init_scene() {
   cube = gen_cube();
   min_max_height[0] = FLT_MAX;
   min_max_height[1] = FLT_MIN;
-  refresh_sphere();
+  //refresh_sphere();
 
   glm_ortho(-1.0, 1.0, -1.0, 1.0, 0.0, 1000.0, ortho_proj);
   glm_perspective(glm_rad(45.0f), ((float) RES_X) / ((float) RES_Y), 0.1,
