@@ -5,7 +5,6 @@ FILES = $(wildcard ./src/*.c)
 OBJS = $(FILES:%=$(BUILD_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
 DFLAGS = -g -O3 -Wall -Werror -MMD -MP
-FLAG = 0
 
 # OS-SPECIFIC SETTINGS
 ifeq ($(OS),Windows_NT)
@@ -29,7 +28,7 @@ endif
 all: ./bin/src $(BUILD_DIR)/EOW
 
 $(BUILD_DIR)/EOW: $(OBJS)
-	$(CC) $(LIBS) $(OBJS) -o $@ $(LINK)
+	$(CC) $(LIBS) $(OBJS) -Wl,-rpath=./lib -o  $@ $(LINK)
 
 $(BUILD_DIR)/%.c.o: %.c
 	$(CC) $(DFLAGS) $(INCLUDE) -c $< -o $@
