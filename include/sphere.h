@@ -6,7 +6,7 @@
 #include <const.h>
 #include <model_str.h>
 
-int NUM_POINTS = 10000;
+int NUM_POINTS = 100000;
 int SEED = 1000;
 int DEPTH = 5;
 float FREQ = 0.05;

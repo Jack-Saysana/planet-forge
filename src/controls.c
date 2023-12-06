@@ -69,6 +69,26 @@ void keyboard_input(GLFWwindow *window) {
     cam_translate((vec3) {delta_time, 0.0, 0.0});
   }
 
+  if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
+    NUM_POINTS++;
+    free_mesh_data(sphere_mesh);
+    free_model(sphere);
+    sphere_mesh = gen_sphere();
+    sphere = init_model(sphere_mesh);
+    fprintf(stderr, "%d\n", NUM_POINTS);
+  }
+  if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+    NUM_POINTS--;
+    if (NUM_POINTS < 4) {
+      NUM_POINTS = 4;
+    }
+    free_mesh_data(sphere_mesh);
+    free_model(sphere);
+    sphere_mesh = gen_sphere();
+    sphere = init_model(sphere_mesh);
+    fprintf(stderr, "%d\n", NUM_POINTS);
+  }
+
   /* Increase Radius */
   if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS &&
       !holding_equal) {
