@@ -10,6 +10,7 @@ MESH_DATA *gen_sphere() {
   glm_vec3_copy((vec3) {0.0, 1.0, 0.0}, points[3]);
 
   for (float i = 4; i < (float) NUM_POINTS; i += 1.0) {
+  //for (float i = 0; i < (float) NUM_POINTS; i += 1.0) {
     int index = (int) i;
     float x = i / phi;
     /* Keep just the decimal part of x */
@@ -41,7 +42,7 @@ MESH_DATA *gen_sphere() {
   free(triangles);
 
   // Convert flat mesh into a sphere
-  deparameterize(mesh);
+//  deparameterize(mesh);
   return mesh;
 }
 
@@ -68,8 +69,9 @@ void apply_noise(MESH_DATA *mesh) {
 
     // Apply perlin noise displacement
     vec3 disp_vector = GLM_VEC3_ZERO_INIT;
-    glm_vec3_copy(cur_sphere_pt, disp_vector);
-    glm_normalize(disp_vector);
+    //glm_vec3_copy(cur_sphere_pt, disp_vector);
+    //glm_normalize(disp_vector);
+    glm_vec3_copy((vec3) { 0.0, 0.0, 1.0 }, disp_vector);
 
     // Addresses seam issues from perlin noise
     float uvx = cos(PI * (mesh->vertices[i].tex_pos[X] -

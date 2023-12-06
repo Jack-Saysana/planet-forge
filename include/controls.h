@@ -7,6 +7,7 @@
 
 extern float RES_X;
 extern float RES_Y;
+extern int NUM_POINTS;
 
 int first_move = 1;
 double prev_x = 0.0;
@@ -17,6 +18,8 @@ int cursor_enabled = 1;
 int holding_grave = 0;
 int holding_equal = 0;
 int holding_minus = 0;
+int holding_o = 0;
+int holding_p = 0;
 
 extern mat4 ortho_proj;
 extern mat4 persp_proj;
@@ -42,3 +45,5 @@ MESH_DATA *copy_mesh(MESH_DATA *);
 MODEL *init_model(MESH_DATA *);
 void free_mesh_data(MESH_DATA *);
 void free_model(MODEL *);
+MESH_DATA *gen_sphere();
+MODEL *init_model(MESH_DATA *);
