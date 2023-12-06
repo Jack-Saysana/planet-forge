@@ -52,6 +52,7 @@ void keyboard_input(GLFWwindow *window) {
     } else {
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
       cursor_enabled = 1;
+      first_move = 1;
     }
     holding_grave = 1;
   } else if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) != GLFW_PRESS) {
@@ -71,7 +72,8 @@ void keyboard_input(GLFWwindow *window) {
     cam_translate((vec3) {speed * delta_time, 0.0, 0.0});
   }
 
-  /* Increase Radius */
+  /*
+  // Increase Radius
   if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS &&
       !holding_equal) {
     RADIUS += 0.5;
@@ -81,7 +83,7 @@ void keyboard_input(GLFWwindow *window) {
   } else if (glfwGetKey(window, GLFW_KEY_EQUAL) != GLFW_PRESS) {
     holding_equal = 0;
   }
-
+  // Decrease Radius
   if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS &&
       !holding_minus) {
     RADIUS -= 0.5;
@@ -91,6 +93,7 @@ void keyboard_input(GLFWwindow *window) {
   } else if (glfwGetKey(window, GLFW_KEY_MINUS) != GLFW_PRESS) {
     holding_minus = 0;
   }
+  */
 
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS &&
       !holding_space) {
@@ -98,6 +101,18 @@ void keyboard_input(GLFWwindow *window) {
     holding_space = 1;
   } else if (glfwGetKey(window, GLFW_KEY_SPACE) != GLFW_PRESS) {
     holding_space = 0;
+  }
+
+  // Increase Mountains
+  if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) {
+    incr_intv += 0.001;
+    refresh_sphere();
+  }
+
+  // Decrease Mountains
+  if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) {
+    incr_intv -= 0.001;
+    refresh_sphere();
   }
 }
 
@@ -115,6 +130,8 @@ void fb_size_callback(GLFWwindow *window, int width, int height) {
 void refresh_sphere() {
   MESH_DATA *noisy = copy_mesh(sphere_mesh);
   apply_noise(noisy);
+//  increase_height(noisy);
+//  decrease_height(noisy);
   free_model(sphere);
   sphere = init_model(noisy);
   free_mesh_data(noisy);
@@ -124,4 +141,3 @@ void refresh_sphere() {
   atmosphere = init_model(new_atmo);
   free_mesh_data(new_atmo);
 }
-

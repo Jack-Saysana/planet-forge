@@ -10,9 +10,15 @@ int NUM_POINTS = NUM_POINTS_INIT;
 int SEED = 1000;
 int DEPTH = DEPTH_INIT;
 float FREQ = FREQ_INIT;
-
 float EPSILON = EPSILON_INIT;
 float RADIUS = RADIUS_INIT;
+
+float incr_intv = 0.0;
+float mountain_size = 2.0;
+extern vec2 min_max_height;
+
+extern int holding_zero;
+extern int holding_nine;
 
 extern MESH_DATA *sphere_mesh;
 extern MODEL *sphere;
@@ -24,7 +30,7 @@ MESH_DATA *gen_sphere();
 void deparameterize(MESH_DATA *);
 int double_buffer(void **, size_t *, size_t);
 float calc_displacement(vec2);
-void calc_tex_coords(vec2, vec2);
+void calc_tex_coords(vec3, vec2);
 
 /* ------------- EXTERNALLY DEFINED FUNCITONS -----------*/
 

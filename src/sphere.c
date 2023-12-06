@@ -56,7 +56,58 @@ void deparameterize(MESH_DATA *mesh) {
 
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].norm);
+    glm_vec3_zero(mesh->vertices[i].tangent);
+    glm_vec3_zero(mesh->vertices[i].bitangent);
     glm_vec3_normalize(mesh->vertices[i].norm);
+  }
+  for (size_t i = 0; i < mesh->num_inds; i++) {
+    VERT *vert_zero = mesh->vertices + mesh->indices[i][0];
+    VERT *vert_one = mesh->vertices + mesh->indices[i][1];
+    VERT *vert_two = mesh->vertices + mesh->indices[i][2];
+    vec3 e1 = GLM_VEC2_ZERO_INIT;
+    vec3 e2 = GLM_VEC2_ZERO_INIT;
+    glm_vec3_sub((vert_one->pos), (vert_zero->pos), e1);
+    glm_vec3_sub((vert_two->pos), (vert_zero->pos), e2);
+    float du1 = vert_one->tex_pos[0] - vert_zero->tex_pos[0];
+    float du2 = vert_two->tex_pos[0] - vert_zero->tex_pos[0];
+    float dv1 = vert_one->tex_pos[1] - vert_zero->tex_pos[1];
+    float dv2 = vert_two->tex_pos[1] - vert_zero->tex_pos[1];
+    float d_divisor = 1.0 / ((du1 * dv2) - (du2 * dv1));
+
+    vec3 tang = {
+      (dv2*e1[X]) - (dv1*e2[X]),
+      (dv2*e1[Y]) - (dv1*e2[Y]),
+      (dv2*e1[Z]) - (dv1*e2[Z])
+    };
+    glm_vec3_scale(tang, d_divisor, tang);
+
+    vec3 bitang = {
+      (-du2*e1[X]) + (du1*e2[X]),
+      (-du2*e1[Y]) + (du1*e2[Y]),
+      (-du2*e1[Z]) + (du1*e2[Z])
+    };
+    glm_vec3_scale(bitang, d_divisor, bitang);
+
+    glm_vec3_normalize(tang);
+    glm_vec3_normalize(bitang);
+    glm_vec3_negate(bitang);
+
+    glm_vec3_copy(tang, vert_zero->tangent);
+    glm_vec3_copy(tang, vert_one->tangent);
+    glm_vec3_copy(tang, vert_two->tangent);
+
+    glm_vec3_copy(bitang, vert_zero->bitangent);
+    glm_vec3_copy(bitang, vert_one->bitangent);
+    glm_vec3_copy(bitang, vert_two->bitangent);
+
+    glm_vec3_cross(tang, bitang, vert_zero->norm);
+    glm_vec3_cross(tang, bitang, vert_one->norm);
+    glm_vec3_cross(tang, bitang, vert_two->norm);
+
+    glm_vec3_normalize(vert_zero->norm);
+    glm_vec3_normalize(vert_one->norm);
+    glm_vec3_normalize(vert_two->norm);
+
   }
 }
 
@@ -71,27 +122,20 @@ void apply_noise(MESH_DATA *mesh) {
     glm_normalize(disp_vector);
 
     // Addresses seam issues from perlin noise
-    /*
-    float uvx = cos(PI * (mesh->vertices[i].tex_pos[X] -
-                          mesh->vertices[i].tex_pos[Y]));
-    float uvy = cos(PI * (mesh->vertices[i].tex_pos[X] +
-                    mesh->vertices[i].tex_pos[Y] - 1.0));
-    float mask = fmax((uvx + uvy) / 10.0, 0.0);
-    float displacement = perlin(mesh->vertices[i].tex_pos[X] * offset,
-                                mesh->vertices[i].tex_pos[Y] * offset, FREQ,
-                                DEPTH, SEED);
-
-    // Clamp perlin output between -0.5 and 0.5
-    displacement -= 0.5;
-    disp_vector[X] *= displacement * mask;
-    disp_vector[Y] *= displacement * mask;
-    disp_vector[Z] *= displacement * mask;
-    */
-
     float displacement = calc_displacement(mesh->vertices[i].tex_pos);
     glm_vec3_scale(disp_vector, displacement, disp_vector);
+    //displacement *= mountain_size;
     glm_vec3_copy(cur_sphere_pt, mesh->vertices[i].pos);
     glm_vec3_add(disp_vector, mesh->vertices[i].pos, mesh->vertices[i].pos);
+    /*
+    dist = glm_vec3_distance(mesh->vertices[i].pos, sphere_center);
+    if (dist > min_max_height[1]) {
+      min_max_height[1] = dist;
+    }
+    if (dist < min_max_height[0]) {
+      min_max_height[0] = dist;
+    }
+    */
   }
 
   // Calculate normal of each triangle
@@ -109,7 +153,7 @@ void apply_noise(MESH_DATA *mesh) {
                  mesh->vertices[cur_triangle[A]].pos,
                  ac);
 
-    glm_vec3_cross(ab, ac, norm);
+    glm_vec3_cross(ac, ab, norm);
     glm_vec3_normalize(norm);
 
     glm_vec3_copy(norm, mesh->vertices[cur_triangle[A]].norm);
@@ -129,11 +173,22 @@ float calc_displacement(vec2 tex_coords) {
 
   // Clamp perlin output between -0.5 and 0.5
   displacement -= 0.5;
+  displacement *= mask * mountain_size;
 
-  return displacement * mask;
+  if (displacement > 0.035) {
+    displacement += (1.0 + displacement - 0.035) * incr_intv;
+    if (1.0 + displacement > min_max_height[1]) {
+      min_max_height[1] = 1.0 + displacement;
+    }
+    if (1.0 + displacement < min_max_height[0]) {
+      min_max_height[0] = 1.0 + displacement;
+    }
+  }
+
+  return displacement;
 }
 
-void calc_tex_coords(vec2 s_coords, vec2 tex_coords) {
+void calc_tex_coords(vec3 s_coords, vec2 tex_coords) {
   tex_coords[X] = atan2(s_coords[Y], s_coords[X]) / (2.0 * PI) + 0.5;
   tex_coords[Y] = (1.0 - s_coords[Z]) / 2.0;
 }

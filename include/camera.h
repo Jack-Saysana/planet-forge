@@ -21,6 +21,7 @@ static float cam_velocity;
 // ======================= INTERNALLY DEFINED FUNCTIONS =======================
 
 void calc_cam_space(mat4);
+void get_cam_loc(vec3);
 
 // ======================= EXTERNALLY DEFINED FUNCTIONS =======================
 
