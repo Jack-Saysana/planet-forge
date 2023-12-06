@@ -24,13 +24,17 @@ void init_scene() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  imgui_add_i_slider("NUM_POINTS", &NUM_POINTS, 4, 10000);
-  imgui_add_i_slider("DEPTH", &DEPTH, 0, 10);
-  imgui_add_f_slider("FREQ", &FREQ, 0.0, 10.0);
-  imgui_add_f_slider("EPSILON", &EPSILON, 0.0, 1.0);
-  imgui_add_f_slider("RADIUS", &RADIUS, 0.0, 100.0);
+  imgui_add_i_slider("Resolution", &NUM_POINTS, 4, 10000);
+  imgui_add_i_slider("Terrain Smoothing", &DEPTH, 0, 10);
+  imgui_add_f_slider("Mountain Size", &incr_intv, 0.0, 0.1);
+  imgui_add_f_slider("Continent Division", &FREQ, 0.0, 10.0);
+  imgui_add_f_slider("Terrain Differential", &mountain_size, 1.0, 10.0);
+  imgui_add_f_slider("Planet Radius", &RADIUS, 0.0, 100.0);
   imgui_add_i_slider("Camera Mode", &camera_mode, 0, 1);
-  imgui_add_f_slider("SPEED", &speed, 0.0, 50.0);
+  imgui_add_f_slider("Camera Speed", &speed, 0.0, 50.0);
+  imgui_add_i_slider("Ocean Wave Mode", &normal_map_enabled, 0, 1);
+  imgui_add_f_slider("Day Cycle Speed", &day_cycle, 0.1, 0.75);
+  imgui_add_f_slider("Sea Level", &ocean_offset, 0.0, 0.05);
 }
 
 void update_shaders() {
@@ -214,9 +218,9 @@ void render_ocean() {
   glm_rotate_x(model, glm_rad(90.0), model);
   glm_translate(model, planet_pos);
   glm_scale(model, (vec3) {
-    RADIUS + ocean_offset,
-    RADIUS + ocean_offset,
-    RADIUS + ocean_offset
+    RADIUS + (RADIUS * ocean_offset),
+    RADIUS + (RADIUS * ocean_offset),
+    RADIUS + (RADIUS * ocean_offset)
   });
   mat4 view = GLM_MAT4_IDENTITY_INIT;
   calc_cam_space(view);

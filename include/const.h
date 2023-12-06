@@ -5,11 +5,13 @@
 #define INVALID_TEXTURE (0xBEEFBEEF)
 #define STARTING_BUFF_LEN (10)
 
-#define NUM_POINTS_INIT (1000)
+#define NUM_POINTS_INIT (3000)
 #define DEPTH_INIT (5)
-#define FREQ_INIT (0.05)
+#define FREQ_INIT (1.5)
 #define EPSILON_INIT (0.5)
 #define RADIUS_INIT (9.0)
+#define INCR_INTV_INIT (0.0)
+#define MOUNTAIN_SIZE_INIT (2.0)
 
 #define FLYING (0)
 #define GROUND (1)

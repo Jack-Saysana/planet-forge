@@ -13,7 +13,7 @@ float FREQ = FREQ_INIT;
 float EPSILON = EPSILON_INIT;
 float RADIUS = RADIUS_INIT;
 
-float incr_intv = 0.0;
+float incr_intv = INCR_INTV_INIT;
 float mountain_size = 2.0;
 extern vec2 min_max_height;
 

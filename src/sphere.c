@@ -209,36 +209,43 @@ void update_sphere() {
   static float cur_freq = FREQ_INIT;
   static float cur_epsilon = EPSILON_INIT;
   static float cur_radius = RADIUS_INIT;
+  static float cur_incr_intv = INCR_INTV_INIT;
+  static float cur_mountain_size = MOUNTAIN_SIZE_INIT;
 
   if (cur_num_pts != NUM_POINTS) {
     free_mesh_data(sphere_mesh);
     free_model(sphere);
     free_model(atmosphere);
     sphere_mesh = gen_sphere();
-    sphere = init_model(sphere_mesh);
     atmosphere = init_model(sphere_mesh);
+    apply_noise(sphere_mesh);
+    sphere = init_model(sphere_mesh);
 
     cur_num_pts = NUM_POINTS;
 
-    cur_depth = DEPTH_INIT;
-    cur_freq = FREQ_INIT;
+    //cur_depth = DEPTH_INIT;
+    //cur_freq = FREQ_INIT;
     cur_epsilon = EPSILON_INIT;
-    cur_radius = RADIUS_INIT;
+    //cur_radius = RADIUS_INIT;
 
-    DEPTH = DEPTH_INIT;
-    FREQ = FREQ_INIT;
+    //DEPTH = DEPTH_INIT;
+    //FREQ = FREQ_INIT;
     EPSILON = EPSILON_INIT;
-    RADIUS = RADIUS_INIT;
+    //RADIUS = RADIUS_INIT;
   } else if (
       cur_depth != DEPTH ||
       cur_freq != FREQ ||
       cur_epsilon != EPSILON ||
-      cur_radius != RADIUS) {
+      cur_radius != RADIUS ||
+      cur_incr_intv != incr_intv ||
+      cur_mountain_size != mountain_size) {
     refresh_sphere();
 
     cur_depth = DEPTH;
     cur_freq = FREQ;
     cur_epsilon = EPSILON;
     cur_radius = RADIUS;
+    cur_incr_intv = incr_intv;
+    cur_mountain_size = mountain_size;
   }
 }

@@ -15,6 +15,7 @@ extern int DEPTH;
 extern float FREQ;
 extern float EPSILON;
 extern float RADIUS;
+extern float incr_intv;
 
 float RES_X = RES_X_BASE;
 float RES_Y = RES_Y_BASE;
@@ -41,6 +42,7 @@ mat4 persp_proj;
 float day_cycle = 0.25;
 float ocean_offset = 0.01;
 int normal_map_enabled = 1;
+extern float mountain_size;
 vec2 min_max_height = GLM_VEC2_ZERO_INIT;
 extern float mountain_size;
 vec3 light_pos = GLM_VEC3_ZERO_INIT;
