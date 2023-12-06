@@ -9,8 +9,11 @@ int main() {
     keyboard_input(window);
 
     render_scene(window);
+    update_sphere();
+    update_camera();
   }
 
+  imgui_cleanup();
   glfwTerminate();
   return 0;
 }

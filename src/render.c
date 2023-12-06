@@ -3,6 +3,7 @@
 void init_scene() {
   update_shaders();
   sphere_mesh = gen_sphere();
+  atmosphere = init_model(sphere_mesh);
   sphere = init_model(sphere_mesh);
   normal_tex = gen_texture("./maps/ocean_normal_map.jpg");
   ocean = init_model(sphere_mesh);
@@ -12,22 +13,30 @@ void init_scene() {
   min_max_height[1] = FLT_MIN;
   refresh_sphere();
 
-  glm_ortho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0, ortho_proj);
+  glm_ortho(-1.0, 1.0, -1.0, 1.0, 0.0, 1000.0, ortho_proj);
   glm_perspective(glm_rad(45.0f), ((float) RES_X) / ((float) RES_Y), 0.1,
-                  100.0, persp_proj);
+                  1000.0, persp_proj);
 
   glEnable(GL_PROGRAM_POINT_SIZE);
 //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glEnable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
 
+  imgui_add_i_slider("NUM_POINTS", &NUM_POINTS, 4, 10000);
+  imgui_add_i_slider("DEPTH", &DEPTH, 0, 10);
+  imgui_add_f_slider("FREQ", &FREQ, 0.0, 10.0);
+  imgui_add_f_slider("EPSILON", &EPSILON, 0.0, 1.0);
+  imgui_add_f_slider("RADIUS", &RADIUS, 0.0, 100.0);
+  imgui_add_i_slider("Camera Mode", &camera_mode, 0, 1);
+  imgui_add_f_slider("SPEED", &speed, 0.0, 50.0);
+}
 
 void update_shaders() {
   const char *v_shader = DIR"default.vs";
   const char *f_shader = DIR"default.fs";
-  
+
   const char *o_shader = DIR"ocean.fs";
   const char *s_shader = DIR"sun.fs";
   const char *st_shader = DIR"star.fs";
@@ -36,11 +45,14 @@ void update_shaders() {
   const char *g_shader = DIR"norm_vec.gs";
   const char *norm_frag_shader = DIR"norm_vec.fs";
 
+  const char *a_shader = DIR"atmosphere.fs";
+
   test_shader = load_shader(v_shader, NULL, f_shader);
   ocean_shader = load_shader(v_shader, NULL, o_shader);
   sun_shader = load_shader(v_shader, NULL, s_shader);
   star_shader = load_shader(v_shader, NULL, st_shader);
   normal_shader = load_shader(v_shader_norm, g_shader, norm_frag_shader);
+  atmosphere_shader = load_shader(v_shader, NULL, a_shader);
 }
 
 void render_scene(GLFWwindow *window) {
@@ -55,8 +67,10 @@ void render_scene(GLFWwindow *window) {
   render_sphere();
   render_stars();
   render_ocean();
+  render_atmosphere();
   //render_cube();
   //render_normals();
+  render_imgui();
 
   glfwSwapBuffers(window);
   glfwPollEvents();
@@ -66,9 +80,16 @@ void render_sun() {
   mat4 model = GLM_MAT4_IDENTITY_INIT;
   mat4 view = GLM_MAT4_IDENTITY_INIT;
 
-  light_pos[0] = (RADIUS + 3.0) * (cos(day_cycle * glfwGetTime())) + sphere_center[0];
-  light_pos[1] = sphere_center[1];
-  light_pos[2] = (RADIUS + 3.0) * (sin(day_cycle * glfwGetTime())) + sphere_center[2];
+  light_pos[0] = (RADIUS * 2.0) * (cos(day_cycle * glfwGetTime())) +
+                 planet_pos[0];
+  light_pos[1] = planet_pos[1];
+  light_pos[2] = (RADIUS * 2.0) * (sin(day_cycle * glfwGetTime())) +
+                 planet_pos[2];
+  /*
+  light_pos[0] = RADIUS * 2.0;
+  light_pos[1] = planet_pos[1];
+  light_pos[2] = 0.0;
+  */
 
   glm_translate(model, light_pos);
   glm_scale(model, (vec3) {0.1, 0.1, 0.1});
@@ -102,30 +123,53 @@ void render_sphere() {
   mat4 model = GLM_MAT4_IDENTITY_INIT;
   mat4 view = GLM_MAT4_IDENTITY_INIT;
   vec3 camera_pos = GLM_VEC3_ZERO_INIT;
-  glm_translate(model, sphere_center);
+  glm_translate(model, planet_pos);
   glm_scale(model, (vec3) {RADIUS, RADIUS, RADIUS});
   calc_cam_space(view);
-  get_cam_loc(camera_pos);
+  get_cam_pos(camera_pos);
 
   glUseProgram(test_shader);
   set_float("radius", RADIUS, test_shader);
   set_vec2("range", min_max_height, test_shader);
-  set_vec3("sphere_center", sphere_center, test_shader);
+  set_vec3("sphere_center", planet_pos, test_shader);
   set_vec3("camera_position", camera_pos, test_shader);
   set_vec3("light_pos", light_pos, test_shader);
   set_mat4("model", model, test_shader);
   set_mat4("view", view, test_shader);
   set_mat4("proj", persp_proj, test_shader);
+  //draw_points(sphere);
   draw_model(sphere, test_shader);
+}
+
+void render_atmosphere() {
+  mat4 model = GLM_MAT4_IDENTITY_INIT;
+  glm_translate(model, planet_pos);
+  float scale = RADIUS * 1.25;
+  glm_scale(model, (vec3) { scale, scale, scale });
+  mat4 view = GLM_MAT4_IDENTITY_INIT;
+  calc_cam_space(view);
+
+//  vec3 light_pos = { -RADIUS * 3.0, 0.0, 0.0 };
+  vec3 cam_pos = GLM_VEC3_ZERO_INIT;
+  get_cam_pos(cam_pos);
+
+  glUseProgram(atmosphere_shader);
+  set_mat4("model", model, atmosphere_shader);
+  set_mat4("view", view, atmosphere_shader);
+  set_mat4("proj", persp_proj, atmosphere_shader);
+  set_vec3("light_pos", light_pos, atmosphere_shader);
+  set_vec3("planet_pos", planet_pos, atmosphere_shader);
+  set_vec3("view_pos", cam_pos, atmosphere_shader);
+  draw_model(atmosphere, atmosphere_shader);
 }
 
 void render_stars() {
   mat4 model = GLM_MAT4_IDENTITY_INIT;
   mat4 view = GLM_MAT4_IDENTITY_INIT;
   vec3 trans = GLM_VEC3_ZERO_INIT;
-  glm_vec3_copy(sphere_center, trans);
+  glm_vec3_copy(planet_pos, trans);
   vec3 camera_pos = GLM_VEC3_ZERO_INIT;
-  get_cam_loc(camera_pos);
+  get_cam_pos(camera_pos);
   glm_vec3_add(trans, camera_pos, trans);
 
   glm_translate(model, trans);
@@ -135,7 +179,7 @@ void render_stars() {
     RADIUS + 100.0
   });
   calc_cam_space(view);
-  
+
   glUseProgram(star_shader);
   set_float("time", glfwGetTime(), star_shader);
   set_mat4("model", model, star_shader);
@@ -147,8 +191,8 @@ void render_stars() {
 void render_normals() {
   mat4 model = GLM_MAT4_IDENTITY_INIT;
   vec3 camera_pos = GLM_VEC3_ZERO_INIT;
-  get_cam_loc(camera_pos);
-  glm_translate(model, sphere_center);
+  get_cam_pos(camera_pos);
+  glm_translate(model, planet_pos);
   glm_scale(model, (vec3) {
     RADIUS + ocean_offset,
     RADIUS + ocean_offset,
@@ -166,9 +210,9 @@ void render_normals() {
 void render_ocean() {
   mat4 model = GLM_MAT4_IDENTITY_INIT;
   vec3 camera_pos = GLM_VEC3_ZERO_INIT;
-  get_cam_loc(camera_pos);
+  get_cam_pos(camera_pos);
   glm_rotate_x(model, glm_rad(90.0), model);
-  glm_translate(model, sphere_center);
+  glm_translate(model, planet_pos);
   glm_scale(model, (vec3) {
     RADIUS + ocean_offset,
     RADIUS + ocean_offset,
@@ -191,21 +235,21 @@ void render_ocean() {
 }
 
 unsigned int load_shader(const char *v, const char *g, const char *f) {
-  char *vert = NULL; 
-  char *geo = NULL; 
+  char *vert = NULL;
+  char *geo = NULL;
   char *frag = NULL;
   FILE *vs = NULL;
   FILE *gs = NULL;
   FILE *fs = NULL;
   int handle = -1;
   if (v) {
-    vert = (char *)(malloc(4096)); 
+    vert = (char *)(malloc(4096));
     int size = 0;
     vs = fopen(v, "r");
     while (fgetc(vs) != EOF) {
       size++;
     }
-    fseek(vs, 0, SEEK_SET); 
+    fseek(vs, 0, SEEK_SET);
     if (!fread(vert, 1, (size_t) size, vs)) {
       printf("Issue reading vertex shader\n");
     }
@@ -240,6 +284,8 @@ unsigned int load_shader(const char *v, const char *g, const char *f) {
     frag[size] = '\0';
     fclose(fs);
   }
+
+  printf("%s, %s, %s\n", v, g, f);
   handle = init_shader(vert, geo, frag);
   if (vert) {
   free(vert);

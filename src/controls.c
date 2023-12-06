@@ -21,6 +21,7 @@ void mouse_pos(GLFWwindow *window, double x, double y) {
 }
 
 void mouse_button(GLFWwindow *window, int button, int action, int mods) {
+  /*
   if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
     DEPTH++;
     printf("depth: %d\n", DEPTH);
@@ -32,6 +33,7 @@ void mouse_button(GLFWwindow *window, int button, int action, int mods) {
     printf("depth: %d\n", DEPTH);
     refresh_sphere();
   }
+  */
 }
 
 void mouse_scroll(GLFWwindow *window, double x_offset, double y_offset) {
@@ -50,6 +52,7 @@ void keyboard_input(GLFWwindow *window) {
     } else {
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
       cursor_enabled = 1;
+      first_move = 1;
     }
     holding_grave = 1;
   } else if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) != GLFW_PRESS) {
@@ -57,19 +60,20 @@ void keyboard_input(GLFWwindow *window) {
   }
 
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    cam_translate((vec3) {0.0, 0.0, -1.0 * delta_time});
+    cam_translate((vec3) {0.0, 0.0, -speed * delta_time});
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    cam_translate((vec3) {-1.0 * delta_time, 0.0, 0.0});
+    cam_translate((vec3) {-speed * delta_time, 0.0, 0.0});
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    cam_translate((vec3) {0.0, 0.0, delta_time});
+    cam_translate((vec3) {0.0, 0.0, speed * delta_time});
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    cam_translate((vec3) {delta_time, 0.0, 0.0});
+    cam_translate((vec3) {speed * delta_time, 0.0, 0.0});
   }
 
-  /* Increase Radius */
+  /*
+  // Increase Radius
   if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS &&
       !holding_equal) {
     RADIUS += 0.5;
@@ -79,7 +83,7 @@ void keyboard_input(GLFWwindow *window) {
   } else if (glfwGetKey(window, GLFW_KEY_EQUAL) != GLFW_PRESS) {
     holding_equal = 0;
   }
-  /* Decrease Radius  */
+  // Decrease Radius
   if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS &&
       !holding_minus) {
     RADIUS -= 0.5;
@@ -89,29 +93,26 @@ void keyboard_input(GLFWwindow *window) {
   } else if (glfwGetKey(window, GLFW_KEY_MINUS) != GLFW_PRESS) {
     holding_minus = 0;
   }
+  */
 
-  /* Increase Mountains */
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS &&
+      !holding_space) {
+    cam_jump();
+    holding_space = 1;
+  } else if (glfwGetKey(window, GLFW_KEY_SPACE) != GLFW_PRESS) {
+    holding_space = 0;
+  }
+
+  // Increase Mountains
   if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) {
+    incr_intv += 0.001;
     refresh_sphere();
-    holding_zero = 1;
-  } else if (glfwGetKey(window, GLFW_KEY_0) != GLFW_PRESS) {
-    holding_zero = 0;
   }
 
-  /* Decrease Mountains */
+  // Decrease Mountains
   if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) {
+    incr_intv -= 0.001;
     refresh_sphere();
-    holding_nine = 1;
-  } else if (glfwGetKey(window, GLFW_KEY_9) != GLFW_PRESS) {
-    holding_nine = 0;
-  }
-
-    /* Decrease Mountains */
-  if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-    update_shaders();
-    holding_one = 1;
-  } else if (glfwGetKey(window, GLFW_KEY_1) != GLFW_PRESS) {
-    holding_one = 0;
   }
 }
 
@@ -129,9 +130,14 @@ void fb_size_callback(GLFWwindow *window, int width, int height) {
 void refresh_sphere() {
   MESH_DATA *noisy = copy_mesh(sphere_mesh);
   apply_noise(noisy);
-  increase_height(noisy);
-  decrease_height(noisy);
+//  increase_height(noisy);
+//  decrease_height(noisy);
   free_model(sphere);
   sphere = init_model(noisy);
   free_mesh_data(noisy);
+
+  MESH_DATA *new_atmo = gen_sphere();
+  free_model(atmosphere);
+  atmosphere = init_model(new_atmo);
+  free_mesh_data(new_atmo);
 }
